@@ -25,20 +25,7 @@
         <!-- Tabela zostanie wypełniona danymi z Google Sheets -->
     </table>
 
-    <script>
-        const url = 'https://spreadsheets.google.com/feeds/list/13WQi2cFN6kJI1_3_t0p2vRF15tdI0EoxThnkcN6kRLA/1/public/values?alt=json';
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                const table = document.getElementById('Wykresy i final tabela');
-                const rows = data.feed.entry.map(entry => {
-                    return `<tr><td>${entry.gsx$column1.$t}</td><td>${entry.gsx$column2.$t}</td></tr>`;
-                }).join('');
-                table.innerHTML = rows;
-            })
-            .catch(error => console.error('Error fetching data: ', error));
-    </script>
+    <iframe src="https://docs.google.com/spreadsheets/d/13WQi2cFN6kJI1_3_t0p2vRF15tdI0EoxThnkcN6kRLA/pubhtml?gid=340791851&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
 
 </body>
 </html>
