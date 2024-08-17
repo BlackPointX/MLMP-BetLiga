@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamiczna Tabela z Google Sheets</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dynamiczna Tabela z Google Sheets</h1>
+    <table id="data-table">
+        <!-- Tabela zostanie wypełniona danymi z Google Sheets -->
+    </table>
+
+    <script>
+        const sheetID = 'YOUR_SHEET_ID';
+        const url = `https://spreadsheets.google.com/feeds/cells/13WQi2cFN6kJI1_3_t0p2vRF15tdI0EoxThnkcN6kRLA/od6/public/basic?alt=json`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('data-table');
+                const entries = data.feed.entry;
+                let currentRow = '';
+                let tableHTML = '';
+
+                entries.forEach((entry, index) => {
+                    const row = entry.gs$cell.row;
+                    const col = entry.gs$cell.col;
+                    const value = entry.gs$cell.inputValue;
+
+                    if (row !== currentRow) {
+                        if (currentRow !== '') {
+                            tableHTML += '</tr>';
+                        }
+                        tableHTML += '<tr>';
+                        currentRow = row;
+                    }
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+                table.innerHTML = tableHTML;
+            })
+            .catch(error => console.error('Error fetching data: ', error));
+    </script>
+
+</body>
+</html>
