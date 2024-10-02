@@ -1,73 +1,145 @@
-/* Ogólny styl */
-body {
-    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQOQVPD2McYIJMuMXJhL5tsANmASNnjrnZlQ&usqp=CAU') no-repeat center center fixed;
-    background-size: cover;
-    font-family: Arial, sans-serif;
-    color: white;
+* {
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden; /* Zapobiegaj przewijaniu poziomemu na szerokich ekranach */
+    box-sizing: border-box;
 }
 
-.container {
-    text-align: center;
-    width: 100%;
-    max-width: 1200px; /* Dostosowanie dla większych ekranów */
-    padding: 20px;
-    box-sizing: border-box;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
 }
 
 .header {
-    margin-bottom: 20px;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(to right, #282c34, #61dafb);
 }
 
 .header h1 {
-    font-size: 48px;
-    margin: 0;
-    color: #FFFFFF;
+    font-size: 32px;
+    margin-bottom: 10px;
 }
 
 .header h2 {
-    font-size: 24px;
-    margin: 0;
-    color: #FFFFFF;
+    font-size: 20px;
 }
 
-/* Stylizacja tabeli */
-.table {
-    width: 100%;
-    max-width: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 20px;
-    border-radius: 10px;
-    box-sizing: border-box;
-    overflow-x: auto; /* Dodaj przewijanie poziome dla mniejszych ekranów */
+.table-container {
+    margin: 20px auto;
+    width: 95%;  /* Dopasowanie szerokości dla różnych ekranów */
+    overflow-x: auto; /* Przewijanie na małych ekranach */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: auto; /* Elastyczne dopasowanie kolumn */
-}
-
-thead {
-    background-color: #003780;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #003780;
+    background-color: #002366;
     text-align: center;
-    font-size: 16px;
-    color: white;
 }
 
-td img {
+thead th {
+    font-size: 16px; 
+    color: #fff;
+    padding: 8px;
+    background-color: #1f3b77;
+}
+
+tbody td {
+    padding: 10px;
+    font-size: 14px;
+    white-space: nowrap; /* Zapobiega zawijaniu tekstu */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #1a233d;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #243b6c;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-line {
+    display: flex;
+    justify-content: center;
+}
+
+.form-dot {
+    display: inline-block;
+    width: 10px;  /* Domyślna wielkość kropek */
+    height: 10px;
+    margin: 2px;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    margin-right: 10px
+    background-color: #fff; /* Kolor domyślny kropki */
+}
+
+.green {
+    background-color: green;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.red {
+    background-color: red;
+}
+
+.points {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 28px;
+    }
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    thead th, tbody td {
+        font-size: 14px;
+    }
+
+    .form-dot {
+        width: 8px;  /* Kropki mniejsze na średnich ekranach */
+        height: 8px;
+    }
+
+    .table-container {
+        width: 100%; /* Dopasowanie szerokości do średnich ekranów */
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .header h2 {
+        font-size: 16px;
+    }
+
+    thead th, tbody td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .form-dot {
+        width: 6px;  /* Kropki mniejsze na smartfonach */
+        height: 6px;
+    }
+
+    .table-container {
+        width: 100%; /* Dopasowanie szerokości do małych ekranów */
+    }
+}
