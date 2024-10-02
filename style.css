@@ -10,6 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow-x: hidden; /* Zapobiegaj przewijaniu poziomemu na szerokich ekranach */
 }
 
 .container {
@@ -44,11 +45,13 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-sizing: border-box;
+    overflow-x: auto; /* Dodaj przewijanie poziome dla mniejszych ekranów */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: auto; /* Elastyczne dopasowanie kolumn */
 }
 
 thead {
@@ -119,9 +122,18 @@ td img {
         padding: 8px;
     }
 
+    td img {
+        width: 30px;
+        height: 30px;
+    }
+
     .dot {
         width: 12px;
         height: 12px;
+    }
+
+    .dots-row {
+        margin: 3px 0;
     }
 }
 
@@ -139,8 +151,17 @@ td img {
         padding: 6px;
     }
 
+    td img {
+        width: 25px;
+        height: 25px;
+    }
+
     .dot {
         width: 10px;
         height: 10px;
+    }
+
+    .dots-row {
+        margin: 2px 0;
     }
 }
