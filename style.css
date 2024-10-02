@@ -57,6 +57,17 @@ tbody tr:nth-child(even) {
     background-color: #243b6c;
 }
 
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-line {
+    display: flex;
+    justify-content: center;
+}
+
 .form-dot {
     display: inline-block;
     width: 10px;
