@@ -3,29 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamiczna Tabela z Google Sheets</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
+    <title>BetLiga Champions League Edition</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="header">
+        <h1>BetLiga</h1>
+        <h2>Champions League Edition</h2>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>IMIĘ</th>
+                    <th>OBST.</th>
+                    <th>ZDOB.</th>
+                    <th>RÓŻ.</th>
+                    <th>FORMA</th>
+                    <th>PKT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. ⬡</td>
+                    <td>Łukasz</td>
+                    <td>51</td>
+                    <td>56</td>
+                    <td>-5</td>
+                    <td><span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span></td>
+                    <td>21 <span class="points">+21</span></td>
+                </tr>
+                <tr>
+                    <td>2. ⬡</td>
+                    <td>Mateusz</td>
+                    <td>52</td>
+                    <td>56</td>
+                    <td>-4</td>
+                    <td><span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span></td>
+                    <td>15 <span class="points">+15</span></td>
+                </tr>
+                <tr>
+                    <td>3. ⬡</td>
+                    <td>Patryk</td>
+                    <td>55</td>
+                    <td>56</td>
+                    <td>-1</td>
+                    <td><span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span></td>
+                    <td>12 <span class="points">+12</span></td>
+                </tr>
+                <tr>
+                    <td>4. ⬡</td>
+                    <td>Mariusz</td>
+                    <td>61</td>
+                    <td>56</td>
+                    <td>5</td>
+                    <td><span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span></td>
+                    <td>12 <span class="points">+12</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <h1>Dynamiczna Tabela z Google Sheets</h1>
-    <table id="data-table">
-        <!-- Tabela zostanie wypełniona danymi z Google Sheets -->
-    </table>
-
-    <iframe src="https://docs.google.com/spreadsheets/d/13WQi2cFN6kJI1_3_t0p2vRF15tdI0EoxThnkcN6kRLA/pubhtml?gid=340791851&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-
+    <script src="script.js"></script>
 </body>
 </html>
