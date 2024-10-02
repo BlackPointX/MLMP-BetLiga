@@ -1,58 +1,106 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetLiga Champions League Edition</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="header">
-        <h1>BetLiga</h1>
-        <h2>Champions League Edition</h2>
-    </div>
-    
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>IMIĘ</th>
-                    <th>OBST.</th>
-                    <th>ZDOB.</th>
-                    <th>RÓŻ.</th>
-                    <th>FORMA</th>
-                    <th>PKT</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1. ⬡</td>
-                    <td>Łukasz</td>
-                    <td>51</td>
-                    <td>56</td>
-                    <td>-5</td>
-                    <td>
-                        <div class="form">
-                            <div class="form-line">
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                            </div>
-                            <div class="form-line">
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                                <span class="form-dot green"></span><span class="form-dot yellow"></span><span class="form-dot red"></span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>21 <span class="points">+21</span></td>
-                </tr>
-                <!-- Dodaj pozostałych zawodników w ten sam sposób -->
-            </tbody>
-        </table>
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>BetLiga</h1>
+            <h2>UEFA Champions League Edition</h2>
+        </div>
 
-    <script src="script.js"></script>
+        <div class="table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Imię</th>
+                        <th>Obst.</th>
+                        <th>Zdob.</th>
+                        <th>Róż.</th>
+                        <th>Forma</th>
+                        <th>PKT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Łukasz</td>
+                        <td>51</td>
+                        <td>56</td>
+                        <td>-5</td>
+                        <td class="player-form">
+                            <div class="dots-container">
+                                <!-- Kropki Gracza 1 -->
+                                <div class="dots-row">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                </div>
+                                <div class="dots-row">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>21 <span class="points">+21</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Mateusz</td>
+                        <td>52</td>
+                        <td>56</td>
+                        <td>-4</td>
+                        <td class="player-form">
+                            <div class="dots-container">
+                                <!-- Kropki Gracza 2 -->
+                                <div class="dots-row">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                </div>
+                                <div class="dots-row">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot red"></span>
+                                    <span class="dot orange"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot orange"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>15 <span class="points">+15</span></td>
+                    </tr>
+                    <!-- Dodaj więcej wierszy zgodnie z potrzebą -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
