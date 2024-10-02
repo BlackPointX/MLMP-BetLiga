@@ -27,7 +27,8 @@ body {
 
 .table-container {
     margin: 20px auto;
-    width: 90%; /* Zmniejszamy szerokość dla lepszego skalowania */
+    width: 90%; /* Lepsza szerokość dla urządzeń mobilnych */
+    overflow-x: auto; /* Dodajemy przewijanie na małych ekranach */
 }
 
 table {
@@ -37,7 +38,7 @@ table {
 }
 
 thead th {
-    font-size: 16px; /* Zmniejszamy rozmiar tekstu */
+    font-size: 16px;
     color: #fff;
     padding: 8px;
     background-color: #1f3b77;
@@ -46,7 +47,8 @@ thead th {
 tbody td {
     text-align: center;
     padding: 10px;
-    font-size: 14px; /* Zmniejszamy rozmiar czcionki */
+    font-size: 14px;
+    white-space: nowrap; /* Zapobiega zawijaniu tekstu */
 }
 
 tbody tr:nth-child(odd) {
@@ -63,3 +65,76 @@ tbody tr:nth-child(even) {
     align-items: center;
 }
 
+.form-line {
+    display: flex;
+    justify-content: center;
+}
+
+.form-dot {
+    display: inline-block;
+    width: 12px;  /* Większe kropki dla lepszej widoczności */
+    height: 12px;
+    margin: 2px;
+    border-radius: 50%;
+}
+
+.green {
+    background-color: green;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.red {
+    background-color: red;
+}
+
+.points {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 28px;
+    }
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    thead th, tbody td {
+        font-size: 14px;
+    }
+
+    .form-dot {
+        width: 10px;  /* Kropki trochę mniejsze na średnich ekranach */
+        height: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .header h2 {
+        font-size: 16px;
+    }
+
+    thead th, tbody td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .form-dot {
+        width: 8px;  /* Kropki mniejsze na smartfonach */
+        height: 8px;
+    }
+
+    .table-container {
+        width: 100%; /* Dopasowanie szerokości do małych ekranów */
+    }
+}
