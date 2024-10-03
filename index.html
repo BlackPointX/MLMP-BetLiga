@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,150 +26,51 @@
                         <th>PKT</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Łukasz</td>
-                        <td>51</td>
-                        <td>56</td>
-                        <td>-5</td>
-                        <td class="player-form">
-                            <div class="dots-container">
-                                <!-- Kropki Gracza 1 -->
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>21 <span class="points">+21</span></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Mateusz</td>
-                        <td>52</td>
-                        <td>56</td>
-                        <td>-4</td>
-                        <td class="player-form">
-                            <div class="dots-container">
-                                <!-- Kropki Gracza 2 -->
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>15 <span class="points">+15</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Patryk</td>
-                        <td>55</td>
-                        <td>56</td>
-                        <td>-1</td>
-                        <td class="player-form">
-                            <div class="dots-container">
-                                <!-- Kropki Gracza 3 -->
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>12 <span class="points">+12</span></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td><img src="https://via.placeholder.com/40" alt="avatar"> Mariusz</td>
-                        <td>61</td>
-                        <td>56</td>
-                        <td>5</td>
-                        <td class="player-form">
-                            <div class="dots-container">
-                                <!-- Kropki Gracza 4 -->
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                                <div class="dots-row">
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                    <span class="dot red"></span>
-                                    <span class="dot yellow"></span>
-                                    <span class="dot orange"></span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>12 <span class="points">+12</span></td>
-                    </tr>
+                <tbody id="table-body">
+                    <!-- Wiersze będą dodawane dynamicznie -->
                 </tbody>
             </table>
         </div>
+
+        <script>
+            async function fetchData() {
+                const apiUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vEeyW-LjUWLVhex07Mh2MurTYZOGmbATIs70df3OTVManjCaAYD8NanfnGN0X0dBJP-YmCgR0E6F/pubhtml#'; // Wklej tutaj URL z Google Apps Script
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+                    const tableBody = document.getElementById('table-body');
+
+                    data.slice(1).forEach((row, index) => {
+                        const newRow = document.createElement('tr');
+                        
+                        newRow.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td><img src="https://via.placeholder.com/40" alt="avatar"> ${row[1]}</td>
+                            <td>${row[2]}</td>
+                            <td>${row[3]}</td>
+                            <td>${row[4]}</td>
+                            <td class="player-form">
+                                <div class="dots-container">
+                                    <!-- Kropki formy gracza -->
+                                    <div class="dots-row">
+                                        <span class="dot red"></span>
+                                        <span class="dot yellow"></span>
+                                        <span class="dot orange"></span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${row[6]}</td>
+                        `;
+                        
+                        tableBody.appendChild(newRow);
+                    });
+                } catch (error) {
+                    console.error('Błąd podczas pobierania danych:', error);
+                }
+            }
+
+            window.onload = fetchData;
+        </script>
     </div>
 </body>
 </html>
