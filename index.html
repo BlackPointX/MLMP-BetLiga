@@ -91,4 +91,13 @@
                         tableBody.appendChild(newRow);
                     });
                 } catch (error) {
-                    console.error('Błąd 
+                    console.error('Błąd podczas pobierania danych:', error);
+                }
+            }
+
+            window.onload = fetchData;
+            setInterval(fetchData, 30000); // Aktualizacja co 30 sekund
+        </script>
+    </div>
+</body>
+</html>
