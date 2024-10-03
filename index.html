@@ -18,7 +18,6 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Zmiana</th>
                         <th>Imię</th>
                         <th>Obst.</th>
                         <th>Zdob.</th>
@@ -45,14 +44,38 @@
                     tableBody.innerHTML = '';
 
                     data.slice(1).forEach((row, index) => {
+                        // Pobieranie wartości z arkusza
+                        const ranking = row[0];   // Ranking (pozycja)
+                        const zmiana = row[7];    // Zmiana pozycji
+                        const zawodnik = row[1];  // Nazwa zawodnika
+                        const obst = row[2];      // Liczba obstawień
+                        const zdob = row[3];      // Liczba zdobytych punktów
+                        const roznica = row[4];   // Różnica
+                        const forma = row[5];     // Forma
+                        const pkt = row[6];       // Punkty
+
+                        // Ustal symbol na podstawie wartości "zmiana"
+                        let symbol;
+                        if (zmiana > 0) {
+                            symbol = '⬆'; // Strzałka w górę
+                        } else if (zmiana < 0) {
+                            symbol = '⬇'; // Strzałka w dół
+                        } else {
+                            symbol = '⭯'; // Równa się
+                        }
+
+                        // Tworzenie wiersza tabeli
                         const newRow = document.createElement('tr');
-                        
                         newRow.innerHTML = `
-                            <td>${index + 1} <span class="symbol">=</span></td>
-                            <td><div class="avatar"><img src="https://via.placeholder.com/40" alt="avatar"></div> ${row[1]}</td>
-                            <td>${row[2]}</td>
-                            <td>${row[3]}</td>
-                            <td>${row[4]}</td>
+                            <td>
+                                ${ranking} 
+                                <span class="zmiana"> ${zmiana} </span>
+                                <span class="symbol"> ${symbol} </span>
+                            </td>
+                            <td><div class="avatar"><img src="https://via.placeholder.com/40" alt="avatar"></div> ${zawodnik}</td>
+                            <td>${obst}</td>
+                            <td>${zdob}</td>
+                            <td>${roznica}</td>
                             <td class="player-form">
                                 <div class="dots-container">
                                     <div class="dots-row">
@@ -62,19 +85,10 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="points">${row[6]} <span class="points-difference">+${row[6]}</span></td>
+                            <td class="points">${pkt} <span class="points-difference">+${pkt}</span></td>
                         `;
                         
                         tableBody.appendChild(newRow);
                     });
                 } catch (error) {
-                    console.error('Błąd podczas pobierania danych:', error);
-                }
-            }
-
-            window.onload = fetchData;
-            setInterval(fetchData, 30000);
-        </script>
-    </div>
-</body>
-</html>
+                    console.error('Błąd 
