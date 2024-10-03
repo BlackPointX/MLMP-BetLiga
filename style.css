@@ -1,145 +1,143 @@
-* {
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
     font-family: Arial, sans-serif;
-    background-color: #000;
+    background: linear-gradient(135deg, #0d0f20, #061c54);
     color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.header {
+.container {
     text-align: center;
-    padding: 20px;
-    background: linear-gradient(to right, #282c34, #61dafb);
+    max-width: 400px;
+    width: 100%;
+}
+
+.header h1, .header h2 {
+    margin: 0;
+    color: #fff;
 }
 
 .header h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
+    font-size: 2em;
 }
 
 .header h2 {
-    font-size: 20px;
+    font-size: 1.5em;
+    margin-bottom: 20px;
 }
 
 .table-container {
-    margin: 20px auto;
-    width: 95%;  /* Dopasowanie szerokości dla różnych ekranów */
-    overflow-x: auto; /* Przewijanie na małych ekranach */
+    margin-top: 20px;
 }
 
-table {
+table.leaderboard {
     width: 100%;
     border-collapse: collapse;
-    background-color: #002366;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+table.leaderboard thead {
+    background-color: #002766;
+    color: #fff;
+}
+
+table.leaderboard th, table.leaderboard td {
+    padding: 10px;
     text-align: center;
 }
 
-thead th {
-    font-size: 16px; 
+table.leaderboard tbody tr {
+    background-color: #0044cc;
+    border-bottom: 2px solid #003399;
+}
+
+table.leaderboard tbody tr:last-child {
+    border-bottom: none;
+}
+
+table.leaderboard td {
+    font-size: 1.1em;
+}
+
+.avatar img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.points {
+    color: #21e821;
+}
+
+.points-difference {
+    font-size: 0.8em;
+    color: #21e821;
+}
+
+.symbol {
+    font-size: 1.2em;
     color: #fff;
-    padding: 8px;
-    background-color: #1f3b77;
 }
 
-tbody td {
-    padding: 10px;
-    font-size: 14px;
-    white-space: nowrap; /* Zapobiega zawijaniu tekstu */
-}
-
-tbody tr:nth-child(odd) {
-    background-color: #1a233d;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #243b6c;
-}
-
-.form {
+.dots-container {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
-.form-line {
+.dots-row {
     display: flex;
-    justify-content: center;
+    gap: 2px;
 }
 
-.form-dot {
-    display: inline-block;
-    width: 10px;  /* Domyślna wielkość kropek */
+.dot {
+    width: 10px;
     height: 10px;
-    margin: 2px;
     border-radius: 50%;
-    background-color: #fff; /* Kolor domyślny kropki */
-}
-
-.green {
-    background-color: green;
-}
-
-.yellow {
-    background-color: yellow;
+    display: inline-block;
 }
 
 .red {
     background-color: red;
 }
 
-.points {
-    color: #00ff00;
-    font-weight: bold;
+.yellow {
+    background-color: yellow;
 }
 
-/* Media queries for responsive design */
-@media (max-width: 768px) {
+.orange {
+    background-color: orange;
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .header h1 {
-        font-size: 28px;
+        font-size: 1.5em;
     }
 
     .header h2 {
-        font-size: 18px;
+        font-size: 1.2em;
     }
 
-    thead th, tbody td {
-        font-size: 14px;
+    table.leaderboard th, table.leaderboard td {
+        padding: 5px;
     }
 
-    .form-dot {
-        width: 8px;  /* Kropki mniejsze na średnich ekranach */
-        height: 8px;
-    }
-
-    .table-container {
-        width: 100%; /* Dopasowanie szerokości do średnich ekranów */
-    }
-}
-
-@media (max-width: 480px) {
-    .header h1 {
-        font-size: 22px;
-    }
-
-    .header h2 {
-        font-size: 16px;
-    }
-
-    thead th, tbody td {
-        font-size: 12px;
-        padding: 6px;
-    }
-
-    .form-dot {
-        width: 6px;  /* Kropki mniejsze na smartfonach */
-        height: 6px;
-    }
-
-    .table-container {
-        width: 100%; /* Dopasowanie szerokości do małych ekranów */
+    .points {
+        font-size: 1em;
     }
 }
