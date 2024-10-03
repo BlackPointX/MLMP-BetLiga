@@ -92,12 +92,14 @@ table.leaderboard td {
 
 .dots-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: 4px;
 }
 
 .dots-row {
     display: flex;
+    justify-content: center;
     gap: 2px;
 }
 
@@ -116,8 +118,8 @@ table.leaderboard td {
     background-color: yellow;
 }
 
-.orange {
-    background-color: orange;
+.green {
+    background-color: green;
 }
 
 @media screen and (max-width: 600px) {
@@ -140,9 +142,23 @@ table.leaderboard td {
 
     table.leaderboard th, table.leaderboard td {
         padding: 5px;
+        font-size: 0.9em;
     }
 
     .points {
+        font-size: 0.9em;
+    }
+
+    .symbol {
         font-size: 1em;
+    }
+
+    .zmiana {
+        font-size: 0.7em;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
     }
 }
