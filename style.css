@@ -14,9 +14,6 @@ body {
     min-height: 100vh; /* Ustawienie minimalnej wysokości na wysokość ekranu */
 }
 
-
-
-
 .container {
     text-align: center;
     max-width: 400px;
@@ -29,7 +26,8 @@ body {
 }
 
 .header h1 {
-    font-size: 2em;
+    font-size: 2.5em; /* Zwiększenie rozmiaru głównego tytułu */
+    text-transform: uppercase; /* Tekst pisany wielkimi literami */
 }
 
 .header h2 {
@@ -44,7 +42,7 @@ body {
 table.leaderboard {
     width: 100%;
     border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 39, 102, 0.8); /* Przezroczyste tło tabeli */
     border-radius: 10px;
     overflow: hidden;
 }
@@ -55,21 +53,33 @@ table.leaderboard thead {
 }
 
 table.leaderboard th, table.leaderboard td {
-    padding: 10px;
+    padding: 15px; /* Większe odstępy między kolumnami */
     text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em; /* Zwiększenie rozmiaru tekstu */
 }
 
 table.leaderboard tbody tr {
     background-color: #0044cc;
-    border-bottom: 2px solid #003399;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Jasna linia pomiędzy wierszami */
 }
 
 table.leaderboard tbody tr:last-child {
     border-bottom: none;
 }
 
-table.leaderboard td {
-    font-size: 1.1em;
+table.leaderboard td:first-child {
+    font-size: 1.3em; /* Zwiększenie rozmiaru numeracji */
+    font-weight: bold;
+}
+
+table.leaderboard td:nth-child(2) {
+    font-size: 1.3em; /* Zwiększenie rozmiaru imienia */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Odstęp pomiędzy awatarem a imieniem */
 }
 
 .avatar img {
@@ -79,7 +89,6 @@ table.leaderboard td {
     object-fit: cover; /* Zapewnia odpowiednie dopasowanie obrazu do okrągłego kontenera */
     display: block;
 }
-
 
 .points .pkt {
     font-size: 1.2em;
@@ -182,3 +191,4 @@ table.leaderboard td {
         height: 6px;
     }
 }
+
