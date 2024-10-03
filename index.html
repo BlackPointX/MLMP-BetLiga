@@ -34,11 +34,14 @@
 
         <script>
             async function fetchData() {
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec'; // Wklej tutaj URL z Google Apps Script
+                const apiUrl = 'YOUR_APPS_SCRIPT_URL'; // Wstaw tutaj URL z Google Apps Script
                 try {
                     const response = await fetch(apiUrl);
                     const data = await response.json();
                     const tableBody = document.getElementById('table-body');
+
+                    // Wyczyszczenie poprzednich danych przed aktualizacją
+                    tableBody.innerHTML = '';
 
                     data.slice(1).forEach((row, index) => {
                         const newRow = document.createElement('tr');
@@ -51,7 +54,6 @@
                             <td>${row[4]}</td>
                             <td class="player-form">
                                 <div class="dots-container">
-                                    <!-- Kropki formy gracza -->
                                     <div class="dots-row">
                                         <span class="dot red"></span>
                                         <span class="dot yellow"></span>
@@ -69,7 +71,11 @@
                 }
             }
 
+            // Wywołanie pobrania danych natychmiast po załadowaniu strony
             window.onload = fetchData;
+
+            // Ustawienie aktualizacji danych co 30 sekund (30000 milisekund)
+            setInterval(fetchData, 30000); // 30000 ms = 30 sekund
         </script>
     </div>
 </body>
