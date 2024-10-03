@@ -2,9 +2,10 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png'); /* Tutaj dodaj link do obrazu */
+    background: linear-gradient(135deg, #0d0f20, #061c54); /* Domyślny niebieski gradient */
+    background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png'); /* Obraz tła */
     background-size: cover; /* Dopasowanie obrazu do całej strony */
-    background-position: center; /* Obraz wycentrowany */
+    background-position: center; /* Wycentrowanie obrazu tła */
     background-repeat: no-repeat; /* Zapobiega powtarzaniu obrazu */
     color: #fff;
     display: flex;
@@ -12,6 +13,7 @@ body {
     align-items: center;
     min-height: 100vh;
 }
+
 
 
 .container {
