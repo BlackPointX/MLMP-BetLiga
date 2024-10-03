@@ -4,15 +4,16 @@ body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #0d0f20, #061c54); /* Domyślny niebieski gradient */
     background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png'); /* Obraz tła */
-    
+    background-size: cover; /* Dopasowanie obrazu do całej strony */
     background-position: center; /* Wycentrowanie obrazu tła */
-   
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu obrazu */
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-   
+    min-height: 100vh; /* Ustawienie minimalnej wysokości na wysokość ekranu */
 }
+
 
 
 
