@@ -51,7 +51,7 @@
                         const obst = row[2];      // Liczba obstawień
                         const zdob = row[3];      // Liczba zdobytych punktów
                         const roznica = row[4];   // Różnica
-                        const forma = row[5];     // Forma
+                        const forma = row[5];     // Forma jako sekwencja cyfr
                         const pkt = row[6];       // Punkty
 
                         // Ustal symbol na podstawie wartości "zmiana"
@@ -63,6 +63,11 @@
                         } else {
                             symbol = '⭯'; // Równa się
                         }
+
+                        // Generowanie formy (18 symboli, 2 rzędy)
+                        const formaArray = forma.split(',');
+                        const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                        const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
 
                         // Tworzenie wiersza tabeli
                         const newRow = document.createElement('tr');
@@ -78,11 +83,8 @@
                             <td>${roznica}</td>
                             <td class="player-form">
                                 <div class="dots-container">
-                                    <div class="dots-row">
-                                        <span class="dot red"></span>
-                                        <span class="dot yellow"></span>
-                                        <span class="dot orange"></span>
-                                    </div>
+                                    <div class="dots-row">${row1}</div>
+                                    <div class="dots-row">${row2}</div>
                                 </div>
                             </td>
                             <td class="points">${pkt} <span class="points-difference">+${pkt}</span></td>
@@ -92,6 +94,17 @@
                     });
                 } catch (error) {
                     console.error('Błąd podczas pobierania danych:', error);
+                }
+            }
+
+            // Funkcja zwracająca symbol na podstawie liczby
+            function getSymbol(value) {
+                if (value == 3) {
+                    return '<span class="dot green"></span>';
+                } else if (value == 1) {
+                    return '<span class="dot yellow"></span>';
+                } else if (value == 0) {
+                    return '<span class="dot red"></span>';
                 }
             }
 
