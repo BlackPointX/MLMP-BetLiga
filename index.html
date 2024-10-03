@@ -46,13 +46,14 @@
                     data.slice(1).forEach((row, index) => {
                         // Pobieranie wartości z arkusza
                         const ranking = row[0];   // Ranking (pozycja)
-                        const zmiana = row[7];    // Zmiana pozycji
-                        const zawodnik = row[1];  // Nazwa zawodnika
-                        const obst = row[2];      // Liczba obstawień
-                        const zdob = row[3];      // Liczba zdobytych punktów
-                        const roznica = row[4];   // Różnica
-                        const forma = row[5];     // Forma jako sekwencja cyfr
-                        const pkt = row[6];       // Punkty
+                        const zmiana = row[1];    // Zmiana pozycji
+                        const zawodnik = row[2];  // Nazwa zawodnika
+                        const obst = row[3];      // Liczba obstawień
+                        const zdob = row[4];      // Liczba zdobytych punktów
+                        const roznica = row[5];   // Różnica
+                        const forma = row[6];     // Forma jako sekwencja cyfr
+                        const pkt = row[7];       // Punkty
+                        const plusPkt = row[8];   // Dodatkowe punkty
 
                         // Ustal symbol na podstawie wartości "zmiana"
                         let symbol;
@@ -64,10 +65,11 @@
                             symbol = '⭯'; // Równa się
                         }
 
-                        // Generowanie formy (18 symboli, 2 rzędy)
+                        // Generowanie formy (18 symboli, 3 rzędy po 6 symboli)
                         const formaArray = forma.split(',');
-                        const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
-                        const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+                        const row1 = formaArray.slice(0, 6).map(val => getSymbol(val)).join('');
+                        const row2 = formaArray.slice(6, 12).map(val => getSymbol(val)).join('');
+                        const row3 = formaArray.slice(12, 18).map(val => getSymbol(val)).join('');
 
                         // Tworzenie wiersza tabeli
                         const newRow = document.createElement('tr');
@@ -85,9 +87,13 @@
                                 <div class="dots-container">
                                     <div class="dots-row">${row1}</div>
                                     <div class="dots-row">${row2}</div>
+                                    <div class="dots-row">${row3}</div>
                                 </div>
                             </td>
-                            <td class="points">${pkt} <span class="points-difference">+${pkt}</span></td>
+                            <td class="points">
+                                <span class="pkt">${pkt}</span> 
+                                <span class="plus-pkt">${plusPkt}</span>
+                            </td>
                         `;
                         
                         tableBody.appendChild(newRow);
