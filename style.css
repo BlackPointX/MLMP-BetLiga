@@ -75,12 +75,17 @@ table.leaderboard td {
     font-size: 1.2em;
     font-weight: bold;
     color: white;
+    vertical-align: middle; /* Wyrównanie w pionie */
 }
 
 .points .plus-pkt {
     font-size: 0.8em;
     color: #21e821;
+    vertical-align: middle; /* Wyrównanie w pionie */
+    display: inline-block;
+    margin-left: 5px; /* Odstęp między PKT a +PKT */
 }
+
 
 .symbol {
     font-size: 1.2em;
