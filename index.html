@@ -13,8 +13,8 @@
             <h2>UEFA Champions League Edition</h2>
         </div>
 
-        <div class="table">
-            <table>
+        <div class="table-container">
+            <table class="leaderboard">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -34,7 +34,7 @@
 
         <script>
             async function fetchData() {
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec'; // Wstaw tutaj URL z Google Apps Script
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
                 try {
                     const response = await fetch(apiUrl);
                     const data = await response.json();
@@ -47,8 +47,8 @@
                         const newRow = document.createElement('tr');
                         
                         newRow.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td><img src="https://via.placeholder.com/40" alt="avatar"> ${row[1]}</td>
+                            <td>${index + 1} <span class="symbol">=</span></td>
+                            <td><div class="avatar"><img src="https://via.placeholder.com/40" alt="avatar"></div> ${row[1]}</td>
                             <td>${row[2]}</td>
                             <td>${row[3]}</td>
                             <td>${row[4]}</td>
@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>${row[6]}</td>
+                            <td class="points">${row[6]} <span class="points-difference">+${row[6]}</span></td>
                         `;
                         
                         tableBody.appendChild(newRow);
@@ -71,11 +71,8 @@
                 }
             }
 
-            // Wywołanie pobrania danych natychmiast po załadowaniu strony
             window.onload = fetchData;
-
-            // Ustawienie aktualizacji danych co 30 sekund (30000 milisekund)
-            setInterval(fetchData, 30000); // 30000 ms = 30 sekund
+            setInterval(fetchData, 30000);
         </script>
     </div>
 </body>
