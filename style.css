@@ -71,11 +71,13 @@ table.leaderboard td {
     height: 40px;
 }
 
-.points {
-    color: #21e821;
+.points .pkt {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
 }
 
-.points-difference {
+.points .plus-pkt {
     font-size: 0.8em;
     color: #21e821;
 }
@@ -104,8 +106,8 @@ table.leaderboard td {
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     display: inline-block;
 }
@@ -145,8 +147,12 @@ table.leaderboard td {
         font-size: 0.9em;
     }
 
-    .points {
-        font-size: 0.9em;
+    .points .pkt {
+        font-size: 1em;
+    }
+
+    .points .plus-pkt {
+        font-size: 0.7em;
     }
 
     .symbol {
