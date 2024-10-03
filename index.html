@@ -71,6 +71,25 @@
                         const row2 = formaArray.slice(6, 12).map(val => getSymbol(val)).join('');
                         const row3 = formaArray.slice(12, 18).map(val => getSymbol(val)).join('');
 
+                        // Pobieranie avatarów na podstawie imienia zawodnika
+                        let avatarUrl;
+                        switch(zawodnik) {
+                            case 'Mariusz':
+                                avatarUrl = 'https://drive.google.com/file/d/1rPfCUuVXaHrtKCAPIcyMHDnoRMXghY8S/view?usp=drive_link'; // Link do avatara Mariusza
+                                break;
+                            case 'Łukasz':
+                                avatarUrl = 'https://drive.google.com/file/d/1yigWGzqf1gKwqH3MDoFD3WXYjdtyRKo-/view?usp=drive_link'; // Link do avatara Łukasza
+                                break;
+                            case 'Mateusz':
+                                avatarUrl = 'https://drive.google.com/file/d/1MD5FukSqirWz7Tm_NAqVIC_GTBmiAUDK/view?usp=drive_link'; // Link do avatara Mateusza
+                                break;
+                            case 'Patryk':
+                                avatarUrl = 'https://drive.google.com/file/d/16lbIQf-1RUP3HTpAZUdCzAe9e1-aPbO0/view?usp=drive_link'; // Link do avatara Patryka
+                                break;
+                            default:
+                                avatarUrl = 'https://via.placeholder.com/40'; // Domyślny avatar (placeholder)
+                        }
+
                         // Tworzenie wiersza tabeli
                         const newRow = document.createElement('tr');
                         newRow.innerHTML = `
@@ -79,7 +98,7 @@
                                 <span class="zmiana"> ${zmiana} </span>
                                 <span class="symbol"> ${symbol} </span>
                             </td>
-                            <td><div class="avatar"><img src="https://via.placeholder.com/40" alt="avatar"></div> ${zawodnik}</td>
+                            <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
                             <td>${obst}</td>
                             <td>${zdob}</td>
                             <td>${roznica}</td>
