@@ -73,7 +73,10 @@ table.leaderboard td {
     border-radius: 50%;
     width: 40px;
     height: 40px;
+    object-fit: cover; /* Zapewnia odpowiednie dopasowanie obrazu do okrągłego kontenera */
+    display: block;
 }
+
 
 .points .pkt {
     font-size: 1.2em;
