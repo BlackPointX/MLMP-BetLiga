@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetLiga Champions League Edition</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .highlight {
+            background-color: yellow;
+            transition: background-color 0.5s ease;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -32,19 +38,34 @@
             </table>
         </div>
 
+        <!-- Spinner -->
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+
         <script>
-            async function fetchData() {
+            let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
+
+            async function fetchData(isInitialLoad = false) {
+                if (isInitialLoad) {
+                    document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
+                }
+
                 const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
                 try {
                     const response = await fetch(apiUrl);
                     const data = await response.json();
                     const tableBody = document.getElementById('table-body');
 
-                    tableBody.innerHTML = '';
+                    if (isInitialLoad) {
+                        tableBody.innerHTML = ''; // Wyczyść tabelę przy pierwszym ładowaniu
+                        document.querySelector('table.leaderboard').classList.add('fade-in'); // Dodaj klasę animacji do tabeli
+                    }
 
+                    // Przetwarzanie każdego wiersza danych
                     data.slice(1).forEach((row, index) => {
                         const ranking = row[0];
-                        const zmiana = row[1];
+                        const zmiana = row[1]
                         const zawodnik = row[2];
                         const obst = row[3];
                         const zdob = row[4];
@@ -59,7 +80,7 @@
                         } else if (zmiana < 0) {
                             symbol = '⬇';
                         } else {
-                            symbol = '⭯';
+                            symbol = '=';
                         }
 
                         const formaArray = forma.split(',');
@@ -84,33 +105,112 @@
                                 avatarUrl = 'https://via.placeholder.com/40';
                         }
 
-                        const newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <td>
-                                ${ranking} 
-                                <span class="zmiana"> ${zmiana} </span>
-                                <span class="symbol"> ${symbol} </span>
-                            </td>
-                            <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
-                            <td>${obst}</td>
-                            <td>${zdob}</td>
-                            <td>${roznica}</td>
-                            <td class="player-form">
+                        // Sprawdź, czy dany wiersz już istnieje
+                        const existingRow = document.querySelector(`tr[data-zawodnik="${zawodnik}"]`);
+                        if (existingRow) {
+                            // Porównaj dane i podświetl, jeśli się zmieniły
+                            const rowElements = existingRow.querySelectorAll('td');
+                            let isChanged = false;
+
+                            if (rowElements[2].innerText !== obst) {
+                                rowElements[2].innerText = obst;
+                                isChanged = true;
+                            }
+                            if (rowElements[3].innerText !== zdob) {
+                                rowElements[3].innerText = zdob;
+                                isChanged = true;
+                            }
+                            if (rowElements[4].innerText !== roznica) {
+                                rowElements[4].innerText = roznica;
+                                isChanged = true;
+                            }
+                            if (rowElements[6].querySelector('.pkt').innerText !== pkt) {
+                                rowElements[6].querySelector('.pkt').innerText = pkt;
+                                isChanged = true;
+                            }
+                            if (rowElements[6].querySelector('.plus-pkt').innerText !== plusPkt) {
+                                rowElements[6].querySelector('.plus-pkt').innerText = plusPkt;
+                                isChanged = true;
+                            }
+
+                            if (isChanged) {
+                                highlightRow(existingRow); // Podświetl wiersz
+                            }
+
+                            rowElements[5].innerHTML = `
                                 <div class="dots-container">
                                     <div class="dots-row">${row1}</div>
                                     <div class="dots-row">${row2}</div>
                                 </div>
+                            `;
+                        } else {
+                            // Tworzenie nowego wiersza, jeśli nie istnieje
+                            const newRow = document.createElement('tr');
+                            newRow.classList.add('player-row', 'fade-in-row'); // Dodaj klasę animacji do wiersza
+                            newRow.setAttribute('data-zawodnik', zawodnik); // Ustaw atrybut dla zawodnika
+                            newRow.innerHTML = `
+                                 <td>
+                                ${ranking} 
+                                <span class="zmiana"> ${zmiana} </span>
+                                <span class="symbol"> ${symbol} </span>
                             </td>
-                            <td class="points">
-                                <span class="pkt">${pkt}</span> 
-                                <span class="plus-pkt">${plusPkt}</span>
-                            </td>
-                        `;
-                        
-                        tableBody.appendChild(newRow);
+                                <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
+                                <td>${obst}</td>
+                                <td>${zdob}</td>
+                                <td>${roznica}</td>
+                                <td class="player-form">
+                                    <div class="dots-container">
+                                        <div class="dots-row">${row1}</div>
+                                        <div class="dots-row">${row2}</div>
+                                    </div>
+                                </td>
+                                <td class="points">
+                                    <span class="pkt">${pkt}</span> 
+                                    <span class="plus-pkt">${plusPkt}</span>
+                                </td>
+                            `;
+
+                            const detailsRow = document.createElement('tr');
+                            detailsRow.classList.add('details-row');
+                            detailsRow.innerHTML = `
+                                <td colspan="7">
+                                    <div class="details-placeholder" style="max-height: 0; overflow: hidden;">
+                                        <p>Wykres dla ${zawodnik}</p>
+                                    </div>
+                                </td>
+                            `;
+
+                            newRow.addEventListener('click', () => {
+                                const placeholder = detailsRow.querySelector('.details-placeholder');
+                                const isExpanded = placeholder.style.maxHeight !== '0px';
+                                if (isExpanded) {
+                                    placeholder.style.maxHeight = '0px';
+                                    placeholder.style.overflow = 'hidden';
+                                    expandedRows.delete(zawodnik); // Usuń z zestawu rozwiniętych wierszy
+                                } else {
+                                    placeholder.style.maxHeight = '100px';
+                                    placeholder.style.overflow = 'visible';
+                                    expandedRows.add(zawodnik); // Dodaj do zestawu rozwiniętych wierszy
+                                }
+                            });
+
+                            tableBody.appendChild(newRow);
+                            tableBody.appendChild(detailsRow);
+                        }
+
+                        // Sprawdź, czy wiersz powinien być rozwinięty po aktualizacji
+                        if (expandedRows.has(zawodnik)) {
+                            const placeholder = existingRow.nextElementSibling.querySelector('.details-placeholder');
+                            placeholder.style.maxHeight = '100px';
+                            placeholder.style.overflow = 'visible';
+                        }
                     });
                 } catch (error) {
                     console.error('Błąd podczas pobierania danych:', error);
+                } finally {
+                    if (isInitialLoad) {
+                        document.getElementById('loading-spinner').style.display = 'none'; // Ukryj spinner po pierwszym ładowaniu
+                    }
                 }
             }
 
@@ -123,9 +223,18 @@
                     return '<span class="dot red"></span>';
                 }
             }
+            
+      
 
-            window.onload = fetchData;
-            setInterval(fetchData, 30000); // Aktualizacja co 30 sekund
+            function highlightRow(row) {
+                row.classList.add('highlight'); // Dodaj klasę podświetlenia
+             setTimeout(() => {
+                    row.classList.remove('highlight'); // Usuń klasę podświetlenia po 5 sekundach
+                }, 5000); // 5000 ms = 5 sekund
+            }
+
+            window.onload = () => fetchData(true); // Pobranie danych na początku
+            setInterval(() => fetchData(false), 30000); // Aktualizacja danych co 30 sekund bez spinnera
         </script>
     </div>
 </body>
