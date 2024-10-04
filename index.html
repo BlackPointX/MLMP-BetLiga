@@ -46,15 +46,21 @@
         <script>
             let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
 
-            async function fetchData(isInitialLoad = false) {
-                if (isInitialLoad) {
-                    document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
-                }
+          async function fetchData(isInitialLoad = false) {
+    if (isInitialLoad) {
+        document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
+    }
 
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
-                try {
-                    const response = await fetch(apiUrl);
-                    const data = await response.json();
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
+
+    console.log(`Wysyłanie zapytania do Google Sheets: ${new Date().toISOString()}`); // Dodaj log przed wysłaniem zapytania
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log('Otrzymano odpowiedź:', data); // Loguj odpowiedź z Google Sheets
+
                     const tableBody = document.getElementById('table-body');
 
                     if (isInitialLoad) {
