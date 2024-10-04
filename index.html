@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+    <link rel="icon" href="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetLiga Champions League Edition</title>
@@ -53,18 +54,14 @@
         <script>
             let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
 
-            // Poprawiona funkcja highlightRow, która podświetla wiersze
-            function highlightRow(row) {
-                console.log('Dodano highlight'); // Logowanie dodania podświetlenia
-                row.classList.add('highlight'); // Dodaj klasę podświetlenia
-                setTimeout(() => {
-                    console.log('Usunięto highlight'); // Logowanie usunięcia podświetlenia
-                    row.classList.remove('highlight'); // Usuń klasę podświetlenia po 5 sekundach
-                }, 5000); // 5000 ms = 5 sekund
-            }
-
             async function fetchData(isInitialLoad = false) {
+                if (isInitialLoad) {
+                    document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
+                }
+
                 const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
+
+                console.log(`Wysyłanie zapytania do Google Sheets: ${new Date().toISOString()}`); // Logowanie zapytania
 
                 try {
                     const response = await fetch(apiUrl);
@@ -88,26 +85,64 @@
                         const pkt = row[7];
                         const plusPkt = row[8];
 
+                        let symbol;
+                        if (zmiana > 0) {
+                            symbol = '⬆';
+                        } else if (zmiana < 0) {
+                            symbol = '⬇';
+                        } else {
+                            symbol = '=';
+                        }
+
+                        const formaArray = forma.split(',');
+                        const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                        const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+
+                        let avatarUrl;
+                        switch(zawodnik) {
+                            case 'Mariusz':
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
+                                break;
+                            case 'Łukasz':
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
+                                break;
+                            case 'Mateusz':
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
+                                break;
+                            case 'Patryk':
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
+                                break;
+                            default:
+                                avatarUrl = 'https://via.placeholder.com/40';
+                        }
+
+                        // Sprawdź, czy dany wiersz już istnieje
                         const existingRow = document.querySelector(`tr[data-zawodnik="${zawodnik}"]`);
                         if (existingRow) {
+                            // Porównaj dane i podświetl, jeśli się zmieniły
                             const rowElements = existingRow.querySelectorAll('td');
                             let isChanged = false;
 
-                            // Sprawdzaj wszystkie elementy, aby wykryć zmiany i podświetlić wiersz
-                            if (rowElements[0].querySelector('.zmiana').innerText !== zmiana) {
-                                rowElements[0].querySelector('.zmiana').innerText = zmiana;
+                            // Zmiana wartości zmiana
+                            const zmianaElement = rowElements[0].querySelector('.zmiana');
+                            if (zmianaElement && zmianaElement.innerText.trim() !== zmiana) {
+                                console.log(`Zmiana zmiana dla ${zawodnik}: poprzednia ${zmianaElement.innerText.trim()}, nowa ${zmiana}`);
+                                zmianaElement.innerText = zmiana;
                                 isChanged = true;
                             }
 
                             if (rowElements[2].innerText !== obst) {
+                                console.log(`Zmiana obst dla ${zawodnik}: poprzednia ${rowElements[2].innerText}, nowa ${obst}`);
                                 rowElements[2].innerText = obst;
                                 isChanged = true;
                             }
                             if (rowElements[3].innerText !== zdob) {
+                                console.log(`Zmiana zdob dla ${zawodnik}: poprzednia ${rowElements[3].innerText}, nowa ${zdob}`);
                                 rowElements[3].innerText = zdob;
                                 isChanged = true;
                             }
                             if (rowElements[4].innerText !== roznica) {
+                                console.log(`Zmiana roznica dla ${zawodnik}: poprzednia ${rowElements[4].innerText}, nowa ${roznica}`);
                                 rowElements[4].innerText = roznica;
                                 isChanged = true;
                             }
@@ -121,19 +156,60 @@
                             }
 
                             if (isChanged) {
-                                highlightRow(existingRow); // Podświetl wiersz, gdy dane się zmieniają
+                                highlightRow(existingRow); // Podświetl wiersz
                             }
 
                             rowElements[5].innerHTML = `
                                 <div class="dots-container">
-                                    <div class="dots-row">${getSymbol(forma[0])}</div>
-                                    <div class="dots-row">${getSymbol(forma[1])}</div>
+                                    <div class="dots-row">${row1}</div>
+                                    <div class="dots-row">${row2}</div>
                                 </div>
                             `;
+                        } else {
+                            // Tworzenie nowego wiersza, jeśli nie istnieje
+                            const newRow = document.createElement('tr');
+                            newRow.classList.add('player-row', 'fade-in-row'); // Dodaj klasę animacji do wiersza
+                            newRow.setAttribute('data-zawodnik', zawodnik); // Ustaw atrybut dla zawodnika
+                            newRow.innerHTML = `
+                                 <td>
+                                ${ranking} 
+                                <span class="zmiana"> ${zmiana} </span>
+                                <span class="symbol"> ${symbol} </span>
+                            </td>
+                                <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
+                                <td>${obst}</td>
+                                <td>${zdob}</td>
+                                <td>${roznica}</td>
+                                <td class="player-form">
+                                    <div class="dots-container">
+                                        <div class="dots-row">${row1}</div>
+                                        <div class="dots-row">${row2}</div>
+                                    </div>
+                                </td>
+                                <td class="points">
+                                    <span class="pkt">${pkt}</span> 
+                                    <span class="plus-pkt">${plusPkt}</span>
+                                </td>
+                            `;
+
+                            tableBody.appendChild(newRow);
+                        }
+
+                        // Sprawdź, czy wiersz powinien być rozwinięty po aktualizacji
+                        if (expandedRows.has(zawodnik)) {
+                            const placeholder = existingRow?.nextElementSibling?.querySelector('.details-placeholder');
+                            if (placeholder) {
+                                placeholder.style.maxHeight = '100px';
+                                placeholder.style.overflow = 'visible';
+                            }
                         }
                     });
                 } catch (error) {
                     console.error('Błąd podczas pobierania danych:', error);
+                } finally {
+                    if (isInitialLoad) {
+                        document.getElementById('loading-spinner').style.display = 'none'; // Ukryj spinner po pierwszym ładowaniu
+                    }
                 }
             }
 
