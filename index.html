@@ -122,6 +122,14 @@
                             const rowElements = existingRow.querySelectorAll('td');
                             let isChanged = false;
 
+                            // Zmiana wartości zmiana
+                            const zmianaElement = rowElements[0].querySelector('.zmiana');
+                            if (zmianaElement && zmianaElement.innerText.trim() !== zmiana) {
+                                console.log(`Zmiana zmiana dla ${zawodnik}: poprzednia ${zmianaElement.innerText.trim()}, nowa ${zmiana}`);
+                                zmianaElement.innerText = zmiana;
+                                isChanged = true;
+                            }
+
                             if (rowElements[2].innerText !== obst) {
                                 console.log(`Zmiana obst dla ${zawodnik}: poprzednia ${rowElements[2].innerText}, nowa ${obst}`);
                                 rowElements[2].innerText = obst;
