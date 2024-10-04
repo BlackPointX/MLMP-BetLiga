@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody id="table-body">
-                    <!-- Wiersze będą dodawane dynamicznie -->
+                    <!-- Wiersze będą dodawane dynamicznie przez JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -40,57 +40,50 @@
                     const data = await response.json();
                     const tableBody = document.getElementById('table-body');
 
-                    // Wyczyszczenie poprzednich danych przed aktualizacją
                     tableBody.innerHTML = '';
 
                     data.slice(1).forEach((row, index) => {
-                        // Pobieranie wartości z arkusza
-                        const ranking = row[0];   // Ranking (pozycja)
-                        const zmiana = row[1];    // Zmiana pozycji
-                        const zawodnik = row[2];  // Nazwa zawodnika
-                        const obst = row[3];      // Liczba obstawień
-                        const zdob = row[4];      // Liczba zdobytych punktów
-                        const roznica = row[5];   // Różnica
-                        const forma = row[6];     // Forma jako sekwencja cyfr
-                        const pkt = row[7];       // Punkty
-                        const plusPkt = row[8];   // Dodatkowe punkty
+                        const ranking = row[0];
+                        const zmiana = row[1];
+                        const zawodnik = row[2];
+                        const obst = row[3];
+                        const zdob = row[4];
+                        const roznica = row[5];
+                        const forma = row[6];
+                        const pkt = row[7];
+                        const plusPkt = row[8];
 
-                        // Ustal symbol na podstawie wartości "zmiana"
                         let symbol;
                         if (zmiana > 0) {
-                            symbol = '⬆'; // Strzałka w górę
+                            symbol = '⬆';
                         } else if (zmiana < 0) {
-                            symbol = '⬇'; // Strzałka w dół
+                            symbol = '⬇';
                         } else {
-                            symbol = '⭯'; // Równa się
+                            symbol = '⭯';
                         }
 
-                        // Generowanie formy (18 symboli, 3 rzędy po 6 symboli)
                         const formaArray = forma.split(',');
-                        const row1 = formaArray.slice(0, 6).map(val => getSymbol(val)).join('');
-                        const row2 = formaArray.slice(6, 12).map(val => getSymbol(val)).join('');
-                        const row3 = formaArray.slice(12, 18).map(val => getSymbol(val)).join('');
+                        const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                        const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
 
-                        // Pobieranie avatarów na podstawie imienia zawodnika
                         let avatarUrl;
                         switch(zawodnik) {
                             case 'Mariusz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png'; // Link do avatara Mariusza
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
                                 break;
                             case 'Łukasz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png'; // Link do avatara Łukasza
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
                                 break;
                             case 'Mateusz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png'; // Link do avatara Mateusza
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
                                 break;
                             case 'Patryk':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png'; // Link do avatara Patryka
+                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
                                 break;
                             default:
-                                avatarUrl = 'https://via.placeholder.com/40'; // Domyślny avatar (placeholder)
+                                avatarUrl = 'https://via.placeholder.com/40';
                         }
 
-                        // Tworzenie wiersza tabeli
                         const newRow = document.createElement('tr');
                         newRow.innerHTML = `
                             <td>
@@ -106,7 +99,6 @@
                                 <div class="dots-container">
                                     <div class="dots-row">${row1}</div>
                                     <div class="dots-row">${row2}</div>
-                                    <div class="dots-row">${row3}</div>
                                 </div>
                             </td>
                             <td class="points">
@@ -122,7 +114,6 @@
                 }
             }
 
-            // Funkcja zwracająca symbol na podstawie liczby
             function getSymbol(value) {
                 if (value == 3) {
                     return '<span class="dot green"></span>';
