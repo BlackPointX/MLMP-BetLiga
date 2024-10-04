@@ -2,21 +2,21 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0d0f20, #061c54); /* Domyślny niebieski gradient */
-    background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png'); /* Obraz tła */
-    background-size: cover; /* Dopasowanie obrazu do całej strony */
-    background-position: center; /* Wycentrowanie obrazu tła */
-    background-repeat: no-repeat; /* Zapobiega powtarzaniu obrazu */
+    background: linear-gradient(135deg, #0d0f20, #061c54);
+    background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Ustawienie minimalnej wysokości na wysokość ekranu */
+    min-height: 100vh;
 }
 
 .container {
     text-align: center;
-    max-width: 400px;
+    max-width: 100%; /* Pełna szerokość kontenera */
     width: 100%;
 }
 
@@ -26,23 +26,24 @@ body {
 }
 
 .header h1 {
-    font-size: 2.5em; /* Zwiększenie rozmiaru głównego tytułu */
-    text-transform: uppercase; /* Tekst pisany wielkimi literami */
+    font-size: 1.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .header h2 {
-    font-size: 1.5em;
-    margin-bottom: 20px;
+    font-size: 1.1em;
+    margin-bottom: 15px;
 }
 
 .table-container {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 table.leaderboard {
     width: 100%;
     border-collapse: collapse;
-    background: rgba(0, 39, 102, 0.8); /* Przezroczyste tło tabeli */
+    background: rgba(0, 39, 102, 0.8);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -53,65 +54,85 @@ table.leaderboard thead {
 }
 
 table.leaderboard th, table.leaderboard td {
-    padding: 15px; /* Większe odstępy między kolumnami */
+    padding: 6px;
     text-align: center;
     color: white;
     font-weight: bold;
-    font-size: 1.2em; /* Zwiększenie rozmiaru tekstu */
+    font-size: 0.85em;
+}
+
+table.leaderboard td {
+    vertical-align: middle;
+}
+
+table.leaderboard th:nth-child(1), table.leaderboard td:nth-child(1) {
+    width: 10%; /* Szerokość kolumny dla pozycji */
+}
+
+table.leaderboard th:nth-child(2), table.leaderboard td:nth-child(2) {
+    width: 25%; /* Szerokość kolumny dla imienia */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+table.leaderboard th:nth-child(3), table.leaderboard td:nth-child(3) {
+    width: 10%; /* Szerokość kolumny dla obstawień */
+}
+
+table.leaderboard th:nth-child(4), table.leaderboard td:nth-child(4) {
+    width: 10%; /* Szerokość kolumny dla zdobytych */
+}
+
+table.leaderboard th:nth-child(5), table.leaderboard td:nth-child(5) {
+    width: 10%; /* Szerokość kolumny dla różnicy */
+}
+
+table.leaderboard th:nth-child(6), table.leaderboard td:nth-child(6) {
+    width: 20%; /* Szerokość kolumny dla formy */
+}
+
+table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
+    width: 15%; /* Szerokość kolumny dla punktów */
+}
+
+.avatar img {
+    border-radius: 50%;
+    width: 30px;
+    margin-right: 5px;
+    vertical-align: middle;
 }
 
 table.leaderboard tbody tr {
     background-color: #0044cc;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Jasna linia pomiędzy wierszami */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 table.leaderboard tbody tr:last-child {
     border-bottom: none;
 }
 
-table.leaderboard td:first-child {
-    font-size: 1.3em; /* Zwiększenie rozmiaru numeracji */
-    font-weight: bold;
-}
-
-table.leaderboard td:nth-child(2) {
-    font-size: 1.3em; /* Zwiększenie rozmiaru imienia */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px; /* Odstęp pomiędzy awatarem a imieniem */
-}
-
-.avatar img {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    object-fit: cover; /* Zapewnia odpowiednie dopasowanie obrazu do okrągłego kontenera */
-    display: block;
-}
-
 .points .pkt {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: bold;
     color: white;
-    vertical-align: middle; /* Wyrównanie w pionie */
+    vertical-align: middle;
 }
 
 .points .plus-pkt {
-    font-size: 0.8em;
+    font-size: 0.7em;
     color: #21e821;
-    vertical-align: middle; /* Wyrównanie w pionie */
-    display: inline-block;
-    margin-left: 5px; /* Odstęp między PKT a +PKT */
+    vertical-align: middle;
+    margin-left: 3px;
 }
 
 .symbol {
-    font-size: 1.2em;
+    font-size: 0.9em;
     color: #fff;
 }
 
 .zmiana {
-    font-size: 0.8em;
+    font-size: 0.7em;
     color: #fff;
 }
 
@@ -119,7 +140,7 @@ table.leaderboard td:nth-child(2) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
 }
 
 .dots-row {
@@ -129,8 +150,8 @@ table.leaderboard td:nth-child(2) {
 }
 
 .dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     display: inline-block;
 }
@@ -148,10 +169,6 @@ table.leaderboard td:nth-child(2) {
 }
 
 @media screen and (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-
     .container {
         width: 100%;
         max-width: 100%;
@@ -162,12 +179,12 @@ table.leaderboard td:nth-child(2) {
     }
 
     .header h2 {
-        font-size: 1.2em;
+        font-size: 1em;
     }
 
     table.leaderboard th, table.leaderboard td {
-        padding: 5px;
-        font-size: 0.9em;
+        padding: 4px;
+        font-size: 0.75em;
     }
 
     .points .pkt {
@@ -179,16 +196,15 @@ table.leaderboard td:nth-child(2) {
     }
 
     .symbol {
-        font-size: 1em;
+        font-size: 0.8em;
     }
 
     .zmiana {
-        font-size: 0.7em;
+        font-size: 0.6em;
     }
 
     .dot {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
     }
 }
-
