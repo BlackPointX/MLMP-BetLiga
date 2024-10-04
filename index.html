@@ -10,6 +10,13 @@
             background-color: yellow;
             transition: background-color 0.5s ease;
         }
+        .fade-in-row {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -46,21 +53,18 @@
         <script>
             let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
 
-          async function fetchData(isInitialLoad = false) {
-    if (isInitialLoad) {
-        document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
-    }
+            async function fetchData(isInitialLoad = false) {
+                if (isInitialLoad) {
+                    document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
+                }
 
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
 
-    console.log(`Wysyłanie zapytania do Google Sheets: ${new Date().toISOString()}`); // Dodaj log przed wysłaniem zapytania
+                console.log(`Wysyłanie zapytania do Google Sheets: ${new Date().toISOString()}`); // Logowanie zapytania
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        console.log('Otrzymano odpowiedź:', data); // Loguj odpowiedź z Google Sheets
-
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
                     const tableBody = document.getElementById('table-body');
 
                     if (isInitialLoad) {
@@ -69,9 +73,9 @@
                     }
 
                     // Przetwarzanie każdego wiersza danych
-                    data.slice(1).forEach((row, index) => {
+                    data.slice(1).forEach((row) => {
                         const ranking = row[0];
-                        const zmiana = row[1]
+                        const zmiana = row[1];
                         const zawodnik = row[2];
                         const obst = row[3];
                         const zdob = row[4];
@@ -119,14 +123,17 @@
                             let isChanged = false;
 
                             if (rowElements[2].innerText !== obst) {
+                                console.log(`Zmiana obst dla ${zawodnik}: poprzednia ${rowElements[2].innerText}, nowa ${obst}`);
                                 rowElements[2].innerText = obst;
                                 isChanged = true;
                             }
                             if (rowElements[3].innerText !== zdob) {
+                                console.log(`Zmiana zdob dla ${zawodnik}: poprzednia ${rowElements[3].innerText}, nowa ${zdob}`);
                                 rowElements[3].innerText = zdob;
                                 isChanged = true;
                             }
                             if (rowElements[4].innerText !== roznica) {
+                                console.log(`Zmiana roznica dla ${zawodnik}: poprzednia ${rowElements[4].innerText}, nowa ${roznica}`);
                                 rowElements[4].innerText = roznica;
                                 isChanged = true;
                             }
@@ -176,39 +183,16 @@
                                 </td>
                             `;
 
-                            const detailsRow = document.createElement('tr');
-                            detailsRow.classList.add('details-row');
-                            detailsRow.innerHTML = `
-                                <td colspan="7">
-                                    <div class="details-placeholder" style="max-height: 0; overflow: hidden;">
-                                        <p>Wykres dla ${zawodnik}</p>
-                                    </div>
-                                </td>
-                            `;
-
-                            newRow.addEventListener('click', () => {
-                                const placeholder = detailsRow.querySelector('.details-placeholder');
-                                const isExpanded = placeholder.style.maxHeight !== '0px';
-                                if (isExpanded) {
-                                    placeholder.style.maxHeight = '0px';
-                                    placeholder.style.overflow = 'hidden';
-                                    expandedRows.delete(zawodnik); // Usuń z zestawu rozwiniętych wierszy
-                                } else {
-                                    placeholder.style.maxHeight = '100px';
-                                    placeholder.style.overflow = 'visible';
-                                    expandedRows.add(zawodnik); // Dodaj do zestawu rozwiniętych wierszy
-                                }
-                            });
-
                             tableBody.appendChild(newRow);
-                            tableBody.appendChild(detailsRow);
                         }
 
                         // Sprawdź, czy wiersz powinien być rozwinięty po aktualizacji
                         if (expandedRows.has(zawodnik)) {
-                            const placeholder = existingRow.nextElementSibling.querySelector('.details-placeholder');
-                            placeholder.style.maxHeight = '100px';
-                            placeholder.style.overflow = 'visible';
+                            const placeholder = existingRow?.nextElementSibling?.querySelector('.details-placeholder');
+                            if (placeholder) {
+                                placeholder.style.maxHeight = '100px';
+                                placeholder.style.overflow = 'visible';
+                            }
                         }
                     });
                 } catch (error) {
@@ -229,12 +213,10 @@
                     return '<span class="dot red"></span>';
                 }
             }
-            
-      
 
             function highlightRow(row) {
                 row.classList.add('highlight'); // Dodaj klasę podświetlenia
-             setTimeout(() => {
+                setTimeout(() => {
                     row.classList.remove('highlight'); // Usuń klasę podświetlenia po 5 sekundach
                 }, 5000); // 5000 ms = 5 sekund
             }
