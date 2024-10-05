@@ -78,6 +78,8 @@ table.leaderboard td {
 
 table.leaderboard th:nth-child(1), table.leaderboard td:nth-child(1) {
     width: 10%;
+    /*font-weight: bold;  Opcjonalnie, dodaj pogrubienie 
+    vertical-align: middle;  Wyrównanie pionowe do środka */
 }
 
 table.leaderboard th:nth-child(2), table.leaderboard td:nth-child(2) {
@@ -157,11 +159,17 @@ table.leaderboard tbody tr:last-child {
 .symbol {
     font-size: 0.9em;
     color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2px;
 }
 
 .zmiana {
     font-size: 0.7em;
     color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 1px;
 }
 
 /* Kontener na kropki z formą zawodników */
