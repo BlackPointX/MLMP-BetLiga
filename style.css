@@ -116,9 +116,10 @@ table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
 
 /* Styl dla zmienionego wiersza */
 .highlight {
-    background-color: yellow;
-    transition: background-color 0.5s ease; /* Płynne przejście tła */
+    background-color: rgba(255, 255, 0, 0.5) !important; /* Żółty z 50% przezroczystości */
+    transition: background-color 0.5s ease;
 }
+
 
 /* Styl dla wierszy tabeli */
 table.leaderboard tbody tr {
@@ -252,7 +253,7 @@ table.leaderboard tbody tr:last-child {
 
 /* Animacja pojawiania się wierszy */
 .fade-in-row {
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
