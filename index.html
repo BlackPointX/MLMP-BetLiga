@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <link rel="icon" href="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetLiga Champions League Edition</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .highlight {
-            background-color: yellow;
+            background-color: rgba(255, 255, 0, 0.5) !important; /* Żółty z 50% przezroczystości */
             transition: background-color 0.5s ease;
         }
         .fade-in-row {
@@ -17,6 +16,15 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+        /* Placeholder - ukryty wiersz */
+        .details-placeholder {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .expanded .details-placeholder {
+            max-height: 100px; /* Rozwijanie placeholdera */
         }
     </style>
 </head>
@@ -59,9 +67,7 @@
                     document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
                 }
 
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbz99qGncpQnHJyrA5kfAlngnyQojC4QkYIYuG4I4_ZWganwaoZuWTDS3tPIPtTaKWLUlQ/exec';
-
-                console.log(`Wysyłanie zapytania do Google Sheets: ${new Date().toISOString()}`); // Logowanie zapytania
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbyiwdE4GYJ_LbSZN8t5Z8dEg9seqnlB70tSyKnPc4lIF7chlFTMuUT_PQD-3KQDtTEK6w/exec';
 
                 try {
                     const response = await fetch(apiUrl);
@@ -119,44 +125,39 @@
                         // Sprawdź, czy dany wiersz już istnieje
                         const existingRow = document.querySelector(`tr[data-zawodnik="${zawodnik}"]`);
                         if (existingRow) {
-                            // Porównaj dane i podświetl, jeśli się zmieniły
                             const rowElements = existingRow.querySelectorAll('td');
                             let isChanged = false;
 
                             // Zmiana wartości zmiana
                             const zmianaElement = rowElements[0].querySelector('.zmiana');
-                            if (zmianaElement && zmianaElement.innerText.trim() !== zmiana) {
-                                console.log(`Zmiana zmiana dla ${zawodnik}: poprzednia ${zmianaElement.innerText.trim()}, nowa ${zmiana}`);
+                            if (zmianaElement && parseInt(zmianaElement.innerText.trim()) !== parseInt(zmiana)) {
                                 zmianaElement.innerText = zmiana;
                                 isChanged = true;
                             }
 
-                            if (rowElements[2].innerText !== obst) {
-                                console.log(`Zmiana obst dla ${zawodnik}: poprzednia ${rowElements[2].innerText}, nowa ${obst}`);
+                            if (parseInt(rowElements[2].innerText) !== parseInt(obst)) {
                                 rowElements[2].innerText = obst;
                                 isChanged = true;
                             }
-                            if (rowElements[3].innerText !== zdob) {
-                                console.log(`Zmiana zdob dla ${zawodnik}: poprzednia ${rowElements[3].innerText}, nowa ${zdob}`);
+                            if (parseInt(rowElements[3].innerText) !== parseInt(zdob)) {
                                 rowElements[3].innerText = zdob;
                                 isChanged = true;
                             }
-                            if (rowElements[4].innerText !== roznica) {
-                                console.log(`Zmiana roznica dla ${zawodnik}: poprzednia ${rowElements[4].innerText}, nowa ${roznica}`);
+                            if (parseInt(rowElements[4].innerText) !== parseInt(roznica)) {
                                 rowElements[4].innerText = roznica;
                                 isChanged = true;
                             }
-                            if (rowElements[6].querySelector('.pkt').innerText !== pkt) {
+                            if (parseInt(rowElements[6].querySelector('.pkt').innerText) !== parseInt(pkt)) {
                                 rowElements[6].querySelector('.pkt').innerText = pkt;
                                 isChanged = true;
                             }
-                            if (rowElements[6].querySelector('.plus-pkt').innerText !== plusPkt) {
+                            if (parseInt(rowElements[6].querySelector('.plus-pkt').innerText) !== parseInt(plusPkt)) {
                                 rowElements[6].querySelector('.plus-pkt').innerText = plusPkt;
                                 isChanged = true;
                             }
 
                             if (isChanged) {
-                                highlightRow(existingRow); // Podświetl wiersz
+                                highlightRow(existingRow); // Podświetl wiersz, gdy dane się zmieniają
                             }
 
                             rowElements[5].innerHTML = `
@@ -171,11 +172,11 @@
                             newRow.classList.add('player-row', 'fade-in-row'); // Dodaj klasę animacji do wiersza
                             newRow.setAttribute('data-zawodnik', zawodnik); // Ustaw atrybut dla zawodnika
                             newRow.innerHTML = `
-                                 <td>
-                                ${ranking} 
-                                <span class="zmiana"> ${zmiana} </span>
-                                <span class="symbol"> ${symbol} </span>
-                            </td>
+                                <td>
+                                    ${ranking} 
+                                    <span class="zmiana"> ${zmiana} </span>
+                                    <span class="symbol"> ${symbol} </span>
+                                </td>
                                 <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
                                 <td>${obst}</td>
                                 <td>${zdob}</td>
@@ -192,7 +193,25 @@
                                 </td>
                             `;
 
+                            // Dodanie placeholdera jako kolejny wiersz
+                            const detailsRow = document.createElement('tr');
+                            detailsRow.classList.add('details-row');
+                            detailsRow.innerHTML = `
+                                <td colspan="7">
+                                    <div class="details-placeholder">
+                                        <!-- Szczegóły dla zawodnika -->
+                                        <p>Szczegóły dla ${zawodnik}</p>
+                                    </div>
+                                </td>
+                            `;
+
+                            // Dodanie zdarzenia na kliknięcie w wiersz
+                            newRow.addEventListener('click', () => {
+                                toggleDetails(newRow, detailsRow);
+                            });
+
                             tableBody.appendChild(newRow);
+                            tableBody.appendChild(detailsRow);
                         }
 
                         // Sprawdź, czy wiersz powinien być rozwinięty po aktualizacji
@@ -210,6 +229,17 @@
                     if (isInitialLoad) {
                         document.getElementById('loading-spinner').style.display = 'none'; // Ukryj spinner po pierwszym ładowaniu
                     }
+                }
+            }
+
+            function toggleDetails(row, detailsRow) {
+                const isExpanded = expandedRows.has(row.dataset.zawodnik);
+                if (isExpanded) {
+                    detailsRow.querySelector('.details-placeholder').style.maxHeight = '0';
+                    expandedRows.delete(row.dataset.zawodnik);
+                } else {
+                    detailsRow.querySelector('.details-placeholder').style.maxHeight = '100px';
+                    expandedRows.add(row.dataset.zawodnik);
                 }
             }
 
@@ -231,7 +261,7 @@
             }
 
             window.onload = () => fetchData(true); // Pobranie danych na początku
-            setInterval(() => fetchData(false), 30000); // Aktualizacja danych co 30 sekund bez spinnera
+            setInterval(() => fetchData(false), 3000); // Aktualizacja danych co 30 sekund bez spinnera
         </script>
     </div>
 </body>
