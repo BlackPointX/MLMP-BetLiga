@@ -1,34 +1,25 @@
-<!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetLiga Champions League Edition</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .highlight {
-            background-color: rgba(255, 255, 0, 0.5) !important; /* Żółty z 50% przezroczystości */
-            transition: background-color 0.5s ease;
-        }
-        .fade-in-row {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        /* Placeholder - ukryty wiersz */
-        .details-placeholder {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .expanded .details-placeholder {
-            max-height: 100px; /* Rozwijanie placeholdera */
-        }
-    </style>
 </head>
 <body>
+    <!-- Hamburger menu -->
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="hamburger-menu">
+    <div class="menu-icon" id="menu-icon">
+        &#9776; <!-- Symbol hamburgera -->
+    </div>
+    <nav class="menu-content" id="menu-content">
+        <ul>
+            <li><a href="index2.html" class="menu-link">MŁMP Bet Liga</a></li>
+        </ul>
+    </nav>
+</div>
+
     <div class="container">
         <div class="header">
             <h1>BetLiga</h1>
@@ -62,184 +53,137 @@
         <script>
             let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
 
-            async function fetchData(isInitialLoad = false) {
-                if (isInitialLoad) {
-                    document.getElementById('loading-spinner').style.display = 'flex'; // Pokaż spinner tylko na początku
+            // Funkcja generująca wyniki meczów
+            function generateMatchesHTML() {
+                let matchesHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    matchesHTML += `
+                        <div class="match">
+                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
+                            <span class="result">1:1</span>
+                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
+                        </div>
+                    `;
                 }
-
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbyiwdE4GYJ_LbSZN8t5Z8dEg9seqnlB70tSyKnPc4lIF7chlFTMuUT_PQD-3KQDtTEK6w/exec';
-
-                try {
-                    const response = await fetch(apiUrl);
-                    const data = await response.json();
-                    const tableBody = document.getElementById('table-body');
-
-                    if (isInitialLoad) {
-                        tableBody.innerHTML = ''; // Wyczyść tabelę przy pierwszym ładowaniu
-                        document.querySelector('table.leaderboard').classList.add('fade-in'); // Dodaj klasę animacji do tabeli
-                    }
-
-                    // Przetwarzanie każdego wiersza danych
-                    data.slice(1).forEach((row) => {
-                        const ranking = row[0];
-                        const zmiana = row[1];
-                        const zawodnik = row[2];
-                        const obst = row[3];
-                        const zdob = row[4];
-                        const roznica = row[5];
-                        const forma = row[6];
-                        const pkt = row[7];
-                        const plusPkt = row[8];
-
-                        let symbol;
-                        if (zmiana > 0) {
-                            symbol = '⬆';
-                        } else if (zmiana < 0) {
-                            symbol = '⬇';
-                        } else {
-                            symbol = '=';
-                        }
-
-                        const formaArray = forma.split(',');
-                        const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
-                        const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
-
-                        let avatarUrl;
-                        switch(zawodnik) {
-                            case 'Mariusz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
-                                break;
-                            case 'Łukasz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
-                                break;
-                            case 'Mateusz':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
-                                break;
-                            case 'Patryk':
-                                avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
-                                break;
-                            default:
-                                avatarUrl = 'https://via.placeholder.com/40';
-                        }
-
-                        // Sprawdź, czy dany wiersz już istnieje
-                        const existingRow = document.querySelector(`tr[data-zawodnik="${zawodnik}"]`);
-                        if (existingRow) {
-                            const rowElements = existingRow.querySelectorAll('td');
-                            let isChanged = false;
-
-                            // Zmiana wartości zmiana
-                            const zmianaElement = rowElements[0].querySelector('.zmiana');
-                            if (zmianaElement && parseInt(zmianaElement.innerText.trim()) !== parseInt(zmiana)) {
-                                zmianaElement.innerText = zmiana;
-                                isChanged = true;
-                            }
-
-                            if (parseInt(rowElements[2].innerText) !== parseInt(obst)) {
-                                rowElements[2].innerText = obst;
-                                isChanged = true;
-                            }
-                            if (parseInt(rowElements[3].innerText) !== parseInt(zdob)) {
-                                rowElements[3].innerText = zdob;
-                                isChanged = true;
-                            }
-                            if (parseInt(rowElements[4].innerText) !== parseInt(roznica)) {
-                                rowElements[4].innerText = roznica;
-                                isChanged = true;
-                            }
-                            if (parseInt(rowElements[6].querySelector('.pkt').innerText) !== parseInt(pkt)) {
-                                rowElements[6].querySelector('.pkt').innerText = pkt;
-                                isChanged = true;
-                            }
-                            if (parseInt(rowElements[6].querySelector('.plus-pkt').innerText) !== parseInt(plusPkt)) {
-                                rowElements[6].querySelector('.plus-pkt').innerText = plusPkt;
-                                isChanged = true;
-                            }
-
-                            if (isChanged) {
-                                highlightRow(existingRow); // Podświetl wiersz, gdy dane się zmieniają
-                            }
-
-                            rowElements[5].innerHTML = `
-                                <div class="dots-container">
-                                    <div class="dots-row">${row1}</div>
-                                    <div class="dots-row">${row2}</div>
-                                </div>
-                            `;
-                        } else {
-                            // Tworzenie nowego wiersza, jeśli nie istnieje
-                            const newRow = document.createElement('tr');
-                            newRow.classList.add('player-row', 'fade-in-row'); // Dodaj klasę animacji do wiersza
-                            newRow.setAttribute('data-zawodnik', zawodnik); // Ustaw atrybut dla zawodnika
-                            newRow.innerHTML = `
-                                <td>
-                                    ${ranking} 
-                                    <span class="zmiana"> ${zmiana} </span>
-                                    <span class="symbol"> ${symbol} </span>
-                                </td>
-                                <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
-                                <td>${obst}</td>
-                                <td>${zdob}</td>
-                                <td>${roznica}</td>
-                                <td class="player-form">
-                                    <div class="dots-container">
-                                        <div class="dots-row">${row1}</div>
-                                        <div class="dots-row">${row2}</div>
-                                    </div>
-                                </td>
-                                <td class="points">
-                                    <span class="pkt">${pkt}</span> 
-                                    <span class="plus-pkt">${plusPkt}</span>
-                                </td>
-                            `;
-
-                            // Dodanie placeholdera jako kolejny wiersz
-                            const detailsRow = document.createElement('tr');
-                            detailsRow.classList.add('details-row');
-                            detailsRow.innerHTML = `
-                                <td colspan="7">
-                                    <div class="details-placeholder">
-                                        <!-- Szczegóły dla zawodnika -->
-                                        <p>Szczegóły dla ${zawodnik}</p>
-                                    </div>
-                                </td>
-                            `;
-
-                            // Dodanie zdarzenia na kliknięcie w wiersz
-                            newRow.addEventListener('click', () => {
-                                toggleDetails(newRow, detailsRow);
-                            });
-
-                            tableBody.appendChild(newRow);
-                            tableBody.appendChild(detailsRow);
-                        }
-
-                        // Sprawdź, czy wiersz powinien być rozwinięty po aktualizacji
-                        if (expandedRows.has(zawodnik)) {
-                            const placeholder = existingRow?.nextElementSibling?.querySelector('.details-placeholder');
-                            if (placeholder) {
-                                placeholder.style.maxHeight = '100px';
-                                placeholder.style.overflow = 'visible';
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Błąd podczas pobierania danych:', error);
-                } finally {
-                    if (isInitialLoad) {
-                        document.getElementById('loading-spinner').style.display = 'none'; // Ukryj spinner po pierwszym ładowaniu
-                    }
-                }
+                return matchesHTML;
             }
 
-            function toggleDetails(row, detailsRow) {
-                const isExpanded = expandedRows.has(row.dataset.zawodnik);
-                if (isExpanded) {
-                    detailsRow.querySelector('.details-placeholder').style.maxHeight = '0';
-                    expandedRows.delete(row.dataset.zawodnik);
+            function createPlayerRow(player) {
+                const ranking = player[0];
+                const zmiana = player[1];
+                const zawodnik = player[2];
+                const obst = player[3];
+                const zdob = player[4];
+                const roznica = player[5];
+                const forma = player[6];
+                const pkt = player[7];
+                const plusPkt = player[8];
+
+                let symbol;
+                if (zmiana > 0) {
+                    symbol = '⬆';
+                } else if (zmiana < 0) {
+                    symbol = '⬇';
                 } else {
-                    detailsRow.querySelector('.details-placeholder').style.maxHeight = '100px';
-                    expandedRows.add(row.dataset.zawodnik);
+                    symbol = '=';
+                }
+
+                const formaArray = forma.split(',');
+                const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+
+                let avatarUrl;
+                switch(zawodnik) {
+                    case 'Mariusz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
+                        break;
+                    case 'Łukasz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
+                        break;
+                    case 'Mateusz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
+                        break;
+                    case 'Patryk':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
+                        break;
+                    default:
+                        avatarUrl = 'https://via.placeholder.com/40';
+                }
+
+                // Create player row
+                const playerRow = document.createElement('tr');
+                playerRow.classList.add('player-row', 'fade-in-row');
+                playerRow.setAttribute('data-zawodnik', zawodnik);
+                playerRow.innerHTML = `
+                    <td>
+                        ${ranking}
+                        <span class="zmiana"> ${zmiana} </span>
+                        <span class="symbol"> ${symbol} </span>
+                    </td>
+                    <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
+                    <td>${obst}</td>
+                    <td>${zdob}</td>
+                    <td>${roznica}</td>
+                    <td class="player-form">
+                        <div class="dots-container">
+                            <div class="dots-row">${row1}</div>
+                            <div class="dots-row">${row2}</div>
+                        </div>
+                    </td>
+                    <td class="points">
+                        <span class="pkt">${pkt}</span>
+                        <span class="plus-pkt">${plusPkt}</span>
+                    </td>
+                `;
+
+                // Create placeholder row
+                const detailsRow = document.createElement('tr');
+                detailsRow.classList.add('details-row');
+                detailsRow.setAttribute('data-zawodnik', zawodnik);
+                detailsRow.innerHTML = `
+                    <td colspan="7">
+                        <div class="details-placeholder">
+                            <div class="matches-container">
+                                <div class="matches-row">
+                                    ${generateMatchesHTML()}
+                                </div>
+                                <div class="matches-row">
+                                    ${generateMatchesHTML()}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                // Add event listener to toggle placeholder
+                playerRow.addEventListener('click', () => {
+                    toggleDetails(zawodnik, detailsRow);
+                });
+
+                return {playerRow, detailsRow};
+            }
+
+            function toggleDetails(zawodnik, detailsRow) {
+                const isExpanded = expandedRows.has(zawodnik);
+                if (isExpanded) {
+                    detailsRow.classList.remove('expanded');
+                    expandedRows.delete(zawodnik);
+                } else {
+                    // Zamyka inne rozwinięte placeholdery
+                    expandedRows.forEach(otherZawodnik => {
+                        const otherDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${otherZawodnik}"]`);
+                        if (otherDetailsRow) {
+                            otherDetailsRow.classList.remove('expanded');
+                        }
+                    });
+                    detailsRow.classList.add('expanded');
+                    expandedRows.add(zawodnik);
+
+                    // Dodanie animacji pojawiania się meczów
+                    const matches = detailsRow.querySelectorAll('.match');
+                    matches.forEach((match, index) => {
+                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
+                    });
                 }
             }
 
@@ -254,14 +198,164 @@
             }
 
             function highlightRow(row) {
-                row.classList.add('highlight'); // Dodaj klasę podświetlenia
+                row.classList.add('highlight');
                 setTimeout(() => {
-                    row.classList.remove('highlight'); // Usuń klasę podświetlenia po 5 sekundach
-                }, 5000); // 5000 ms = 5 sekund
+                    row.classList.remove('highlight');
+                }, 5000);
             }
 
-            window.onload = () => fetchData(true); // Pobranie danych na początku
-            setInterval(() => fetchData(false), 3000); // Aktualizacja danych co 30 sekund bez spinnera
+            async function fetchData(isInitialLoad = false) {
+                if (isInitialLoad) {
+                    document.getElementById('loading-spinner').style.display = 'flex';
+                }
+
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbyiwdE4GYJ_LbSZN8t5Z8dEg9seqnlB70tSyKnPc4lIF7chlFTMuUT_PQD-3KQDtTEK6w/exec';
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    const tableBody = document.getElementById('table-body');
+
+                    if (isInitialLoad) {
+                        tableBody.innerHTML = ''; // Wyczyść tabelę przy pierwszym ładowaniu
+                        document.querySelector('table.leaderboard').classList.add('fade-in');
+                    }
+
+                    // Przetwarzanie każdego wiersza danych
+                    data.slice(1).forEach((row) => {
+                        const ranking = row[0];
+                        const zmiana = row[1];
+                        const zawodnik = row[2];
+                        const obst = row[3];
+                        const zdob = row[4];
+                        const roznica = row[5];
+                        const forma = row[6];
+                        const pkt = row[7];
+                        const plusPkt = row[8];
+
+                        // Sprawdź, czy zawodnik już istnieje
+                        let existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                        if (existingPlayerRow) {
+                            // Aktualizacja istniejącego wiersza
+                            const rowElements = existingPlayerRow.querySelectorAll('td');
+                            let isChanged = false;
+
+                            // Aktualizacja zmiany
+                            const zmianaElement = rowElements[0].querySelector('.zmiana');
+                            if (zmianaElement && parseInt(zmianaElement.textContent.trim()) !== parseInt(zmiana)) {
+                                zmianaElement.textContent = zmiana;
+                                isChanged = true;
+                            }
+
+                            // Aktualizacja obst
+                            if (parseInt(rowElements[2].textContent) !== parseInt(obst)) {
+                                rowElements[2].textContent = obst;
+                                isChanged = true;
+                            }
+
+                            // Aktualizacja zdob
+                            if (parseInt(rowElements[3].textContent) !== parseInt(zdob)) {
+                                rowElements[3].textContent = zdob;
+                                isChanged = true;
+                            }
+
+                            // Aktualizacja roznica
+                            if (parseInt(rowElements[4].textContent) !== parseInt(roznica)) {
+                                rowElements[4].textContent = roznica;
+                                isChanged = true;
+                            }
+
+                            // Aktualizacja pkt
+                            const pktElement = rowElements[6].querySelector('.pkt');
+                            if (pktElement && parseInt(pktElement.textContent) !== parseInt(pkt)) {
+                                pktElement.textContent = pkt;
+                                isChanged = true;
+                            }
+
+                            // Aktualizacja plus-pkt
+                            const plusPktElement = rowElements[6].querySelector('.plus-pkt');
+                            if (plusPktElement && parseInt(plusPktElement.textContent) !== parseInt(plusPkt)) {
+                                plusPktElement.textContent = plusPkt;
+                                isChanged = true;
+                            }
+
+                            if (isChanged) {
+                                highlightRow(existingPlayerRow);
+                            }
+
+                            // Aktualizacja formy
+                            const dotsContainer = rowElements[5].querySelector('.dots-container');
+                            const formaArray = forma.split(',');
+                            const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                            const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+                            dotsContainer.innerHTML = `
+                                <div class="dots-row">${row1}</div>
+                                <div class="dots-row">${row2}</div>
+                            `;
+                        } else {
+                            // Tworzenie nowego wiersza zawodnika
+                            const player = row;
+                            const {playerRow, detailsRow} = createPlayerRow(player);
+                            tableBody.appendChild(playerRow);
+                            tableBody.appendChild(detailsRow);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Błąd podczas pobierania danych:', error);
+                    // Możesz dodać tutaj obsługę błędu, np. wyświetlenie komunikatu użytkownikowi
+                } finally {
+                    if (isInitialLoad) {
+                        document.getElementById('loading-spinner').style.display = 'none';
+                    }
+                }
+            }
+
+            window.onload = () => fetchData(true);
+            setInterval(() => fetchData(false), 30000);
+
+           
+            const menuIcon = document.getElementById('menu-icon');
+    const menuContent = document.getElementById('menu-content');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const links = document.querySelectorAll('.menu-link');
+
+    // Funkcja otwierająca i zamykająca menu
+    menuIcon.addEventListener('click', () => {
+        menuContent.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    });
+
+    // Kliknięcie w ciemne tło zamyka menu
+    menuOverlay.addEventListener('click', () => {
+        menuContent.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+    // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
+    menuContent.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.classList.contains('menu-link')) {
+            menuContent.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
+    });
+
+    // Przejście na inną stronę z animacją
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = link.getAttribute('href');
+            }, 500);
+        });
+    });
+
+
+
         </script>
     </div>
 </body>
