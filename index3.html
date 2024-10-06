@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MŁMP BetLiga</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styl dla podświetlenia zmienionych wierszy */
+        .highlight {
+            background-color: #ffff99; /* Jasnożółty kolor */
+            transition: background-color 0.5s ease;
+        }
+
+        /* Styl dla podświetlenia poprawnych wyników meczów */
+        .match.correct {
+            background-color: #045316; /* Jasnozielony kolor */
+            border-radius: 5px;
+        }
+
+        /* Styl dla animacji fade-in dla wierszy szczegółów */
+        .details-row.expanded {
+            display: table-row;
+        }
+
+        .details-row {
+            display: none;
+        }
+
+        /* Animacja dla meczów */
+        @keyframes fadeInMatch {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        
+    </style>
+</head>
+<body>
+    <!-- Hamburger menu -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="hamburger-menu">
+        <div class="menu-icon" id="menu-icon">
+            &#9776; <!-- Symbol hamburgera -->
+        </div>
+        <nav class="menu-content" id="menu-content">
+            <ul>
+                <li><a href="index.html" class="menu-link">Champions League Edition</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>BetLiga</h1>
+            <h2>MŁMP BetLiga</h2>
+        </div>
+
+        <div class="table-container">
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Imię</th>
+                        <th>Obst.</th>
+                        <th>Zdob.</th>
+                        <th>Róż.</th>
+                        <th>Forma</th>
+                        <th>PKT</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Wiersze będą dodawane dynamicznie przez JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Spinner -->
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+
+        <script>
+            let expandedRows = new Set();
+            const currentData = new Map(); // Map to store current player and match data
+
+            // Hamburger Menu Toggle
+            const menuIcon = document.getElementById('menu-icon');
+            const menuContent = document.getElementById('menu-content');
+            const menuOverlay = document.getElementById('menu-overlay');
+
+            menuIcon.addEventListener('click', () => {
+                menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
+                menuOverlay.style.display = menuOverlay.style.display === 'block' ? 'none' : 'block';
+            });
+
+            menuOverlay.addEventListener('click', () => {
+                menuContent.style.display = 'none';
+                menuOverlay.style.display = 'none';
+            });
+
+            // Funkcja pobierająca dane z Google Sheets
+            async function fetchData() {
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbzKHTwb1o2HzhOS6_OY9M_PRm1jSpEgfb-OIzZ8jVMEmyt9RSU8kx407lCImbMzVCUYNA/exec';
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error('Błąd podczas pobierania danych');
+                    }
+                    const data = await response.json();
+                    console.log("Dane zawodników (WWW):", data.WWW); // Wyświetlenie danych zawodników
+                    console.log("Dane wyników (Wyniki):", data.Wyniki); // Wyświetlenie danych wyników
+
+                    // Sprawdzanie, czy dane istnieją
+                    if (!data.WWW || !data.Wyniki) {
+                        throw new Error('Dane z arkusza są niekompletne lub niepoprawne.');
+                    }
+
+                    return data;  // Zwracamy obiekt z danymi z obu arkuszy
+                } catch (error) {
+                    console.error('Błąd podczas pobierania danych:', error);
+                    return null;
+                }
+            }
+
+            // Funkcja generująca wyniki meczów dla wybranego zawodnika
+            function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
+                let matchesHTML = '';
+                for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
+                    const row = resultsData[i];
+                    const playerResult = row[zawodnikIndex];
+                    const wynikResult = row[wynikIndex];
+                    const isCorrect = playerResult === wynikResult;
+
+                    matchesHTML += `
+                        <div class="match ${isCorrect ? 'correct' : ''}">
+                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
+                            <span class="result">${playerResult}</span>
+                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
+                        </div>
+                    `;
+                }
+                return matchesHTML;
+            }
+
+            // Funkcja tworząca wiersz zawodnika i wiersz szczegółów
+            function createPlayerRow(player, resultsData, wynikIndex) {
+                const ranking = player[0];
+                const zmiana = player[1];
+                const zawodnik = player[2];
+                const obst = player[3];
+                const zdob = player[4];
+                const roznica = player[5];
+                const forma = player[6];
+                const pkt = player[7];
+                const plusPkt = player[8];
+
+                let symbol;
+                if (zmiana > 0) {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/up_icon.svg" alt="Up" style="filter: invert(51%) sepia(92%) saturate(355%) hue-rotate(63deg) brightness(94%) contrast(101%); vertical-align: middle; width: 50%;">'; // Zielony
+                } else if (zmiana < 0) {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/down.svg" alt="Down" style="filter: invert(19%) sepia(87%) saturate(7498%) hue-rotate(346deg) brightness(100%) contrast(112%); vertical-align: middle; width: 50%;">'; // Czerwony
+                } else {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/equal.svg" alt="Equal" style="filter: invert(63%) sepia(90%) saturate(1509%) hue-rotate(8deg) brightness(100%) contrast(107%); vertical-align: middle; width: 50%;">'; // Pomarańczowy
+                }
+
+                const formaArray = forma.split(',');
+                const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
+                const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+
+                let avatarUrl;
+                let zawodnikIndex;
+                switch (zawodnik) {
+                    case 'Mariusz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
+                        zawodnikIndex = 0; // Indeks kolumny w danych wyników dla Mariusza
+                        break;
+                    case 'Łukasz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
+                        zawodnikIndex = 1; // Indeks kolumny w danych wyników dla Łukasza
+                        break;
+                    case 'Mateusz':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
+                        zawodnikIndex = 2; // Indeks kolumny w danych wyników dla Mateusza
+                        break;
+                    case 'Patryk':
+                        avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
+                        zawodnikIndex = 3; // Indeks kolumny w danych wyników dla Patryka
+                        break;
+                    default:
+                        avatarUrl = 'https://via.placeholder.com/40';
+                        zawodnikIndex = -1;
+                }
+
+                const playerRow = document.createElement('tr');
+                playerRow.classList.add('player-row', 'fade-in-row');
+                playerRow.setAttribute('data-zawodnik', zawodnik);
+                playerRow.setAttribute('data-ranking', ranking); // Dodanie atrybutu do sortowania
+                playerRow.innerHTML = `
+                    <td>
+                        ${ranking}
+                        <span class="zmiana"> ${zmiana} </span>
+                        <span class="symbol"> ${symbol} </span>
+                    </td>
+                    <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"><span> ${zawodnik}</span></div></td>
+                    <td><span class="bramki">${obst}</span></td>
+                    <td><span class="bramki">${zdob}</span></td>
+                    <td>${roznica}</td>
+                    <td class="player-form">
+                        <div class="dots-container">
+                            <div class="dots-row">${row1}</div>
+                            <div class="dots-row">${row2}</div>
+                        </div>
+                    </td>
+                    <td class="points">
+                        <span class="pkt">${pkt}</span>
+                        <span class="plus-pkt">${plusPkt}</span>
+                    </td>
+                `;
+
+                // Generowanie wyników meczów dla tego zawodnika
+                const detailsRow = document.createElement('tr');
+                detailsRow.classList.add('details-row');
+                detailsRow.setAttribute('data-zawodnik', zawodnik);
+                detailsRow.innerHTML = `
+                    <td colspan="7">
+                        <div class="details-placeholder">
+                            <div class="matches-container">
+                                <div class="matches-row">
+                                    ${zawodnikIndex !== -1 ? generateMatchesHTML(resultsData, zawodnikIndex, 4) : '<p>Brak danych meczowych.</p>'}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                return { playerRow, detailsRow };
+            }
+
+            // Funkcja toggle dla rozwijania i zwijania szczegółów
+            function toggleDetails(zawodnik, detailsRow) {
+                const isExpanded = expandedRows.has(zawodnik);
+                if (isExpanded) {
+                    detailsRow.classList.remove('expanded');
+                    expandedRows.delete(zawodnik);
+                } else {
+                    detailsRow.classList.add('expanded');
+                    expandedRows.add(zawodnik);
+
+                    const matches = detailsRow.querySelectorAll('.match');
+                    matches.forEach((match, index) => {
+                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
+                    });
+                }
+            }
+
+            // Funkcja do generowania symboli na podstawie wartości
+            function getSymbol(value) {
+                if (value == 3) {
+                    return '<span class="dot green"></span>';
+                } else if (value == 1) {
+                    return '<span class="dot yellow"></span>';
+                } else if (value == 0) {
+                    return '<span class="dot red"></span>';
+                }
+            }
+
+            // Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
+            async function loadAndDisplayData(isInitialLoad = false) {
+                if (isInitialLoad) {
+                    document.getElementById('loading-spinner').style.display = 'flex';
+                }
+
+                const data = await fetchData();  // Pobranie danych z obu arkuszy: WWW i Wyniki
+
+                if (!data) {
+                    console.error('Brak danych do wyświetlenia.');
+                    return;
+                }
+
+                try {
+                    const playersData = data.WWW;
+                    const resultsData = data.Wyniki;
+                    const tableBody = document.getElementById('table-body');
+
+                    if (isInitialLoad) {
+                        tableBody.innerHTML = ''; // Wyczyść tabelę przy pierwszym ładowaniu
+                        document.querySelector('table.leaderboard').classList.add('fade-in');
+                    }
+
+                    // Tworzenie mapy nowych danych dla łatwego dostępu
+                    const newDataMap = new Map();
+                    playersData.slice(1).forEach((row) => { // Pomijamy nagłówek
+                        const zawodnik = row[2];
+                        newDataMap.set(zawodnik, row);
+                    });
+
+                    const wynikIndex = 4; // Indeks kolumny 'Wynik'
+
+                    // Aktualizacja istniejących wierszy
+                    newDataMap.forEach((newPlayerData, zawodnik) => {
+                        const existingEntry = currentData.get(zawodnik);
+                        const zawodnikIndex = getZawodnikIndex(zawodnik);
+
+                        if (zawodnikIndex === -1) {
+                            console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
+                            return;
+                        }
+
+                        // Pobieranie nowych danych meczowych
+                        const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+
+                        let hasPlayerDataChanged = false;
+                        let hasMatchDataChanged = false;
+
+                        if (existingEntry) {
+                            // Porównanie danych zawodnika
+                            hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
+
+                            // Porównanie danych meczowych
+                            hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
+                        } else {
+                            // Nowy zawodnik
+                            hasPlayerDataChanged = true;
+                            hasMatchDataChanged = true;
+                        }
+
+                        if (hasPlayerDataChanged || hasMatchDataChanged) {
+                            // Znaleziono zmianę, aktualizuj wiersz
+                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+
+                            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+
+                            if (existingPlayerRow && existingDetailsRow) {
+                                tableBody.replaceChild(playerRow, existingPlayerRow);
+                                tableBody.replaceChild(detailsRow, existingDetailsRow);
+
+                                // Jeśli wiersz był rozwinięty, utrzymaj rozwinięcie
+                                if (expandedRows.has(zawodnik)) {
+                                    detailsRow.classList.add('expanded');
+                                    const matches = detailsRow.querySelectorAll('.match');
+                                    matches.forEach((match, index) => {
+                                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
+                                    });
+                                }
+
+                                // Dodanie klasy podświetlającej, jeśli dane się zmieniły
+                                if (hasPlayerDataChanged) {
+                                    playerRow.classList.add('highlight');
+                                    setTimeout(() => {
+                                        playerRow.classList.remove('highlight');
+                                    }, 2000); // Podświetlenie na 2 sekundy
+                                }
+
+                                if (hasMatchDataChanged) {
+                                    // Znaleziono zmiany w wynikach meczów
+                                    const matches = detailsRow.querySelectorAll('.match');
+                                    matches.forEach(match => {
+                                        if (match.classList.contains('correct')) {
+                                            match.classList.add('highlight');
+                                            setTimeout(() => {
+                                                match.classList.remove('highlight');
+                                            }, 2000); // Podświetlenie na 2 sekundy
+                                        }
+                                    });
+                                }
+                            } else {
+                                // Jeśli zawodnik nie istnieje, dodaj wiersz
+                                tableBody.appendChild(playerRow);
+                                tableBody.appendChild(detailsRow);
+                            }
+
+                            // Aktualizacja mapy bieżących danych
+                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+                        }
+                    });
+
+                    // Usuwanie zawodników, którzy już nie istnieją
+                    currentData.forEach((_, zawodnik) => {
+                        if (!newDataMap.has(zawodnik)) {
+                            const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                            const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                            if (playerRow && detailsRow) {
+                                tableBody.removeChild(playerRow);
+                                tableBody.removeChild(detailsRow);
+                            }
+                            currentData.delete(zawodnik);
+                        }
+                    });
+
+                    // Sortowanie wierszy według rankingów
+                    const sortedPlayers = Array.from(newDataMap.values()).sort((a, b) => a[0] - b[0]); // Zakładam, że a[0] to ranking
+
+                    sortedPlayers.forEach((player, index) => {
+                        const zawodnik = player[2];
+                        const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                        const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+
+                        if (playerRow && detailsRow) {
+                            tableBody.appendChild(playerRow);
+                            tableBody.appendChild(detailsRow);
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Błąd podczas przetwarzania danych:', error);
+                } finally {
+                    if (isInitialLoad) {
+                        document.getElementById('loading-spinner').style.display = 'none';
+                    }
+                }
+            }
+
+            // Funkcja do pobierania indeksu zawodnika w danych Wyniki
+            function getZawodnikIndex(zawodnik) {
+                const mapping = {
+                    'Mariusz': 0,
+                    'Łukasz': 1,
+                    'Mateusz': 2,
+                    'Patryk': 3
+                    // Dodaj inne nazwiska i ich indeksy w razie potrzeby
+                };
+                return mapping[zawodnik] !== undefined ? mapping[zawodnik] : -1;
+            }
+
+            // Delegacja zdarzeń dla kliknięć w wiersze zawodników
+            document.getElementById('table-body').addEventListener('click', function(event) {
+                let target = event.target;
+
+                // Znajdź najbliższego rodzica tr z klasą 'player-row'
+                while (target && target !== this && !target.classList.contains('player-row')) {
+                    target = target.parentElement;
+                }
+
+                if (target && target.classList.contains('player-row')) {
+                    const zawodnik = target.getAttribute('data-zawodnik');
+                    const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                    if (detailsRow) {
+                        toggleDetails(zawodnik, detailsRow);
+                    }
+                }
+            });
+
+            window.onload = () => loadAndDisplayData(true);
+            setInterval(() => loadAndDisplayData(false), 15000);
+        </script>
+    </div>
+</body>
+</html>
