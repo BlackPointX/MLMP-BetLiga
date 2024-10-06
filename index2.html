@@ -15,7 +15,7 @@
     </div>
     <nav class="menu-content" id="menu-content">
         <ul>
-            <li><a href="index.html" class="menu-link">BetLiga Champions League Edition</a></li>
+            <li><a href="index.html" class="menu-link">Champions League Edition</a></li>
         </ul>
     </nav>
 </div>
@@ -80,13 +80,13 @@
                 const plusPkt = player[8];
 
                 let symbol;
-                if (zmiana > 0) {
-                    symbol = '⬆';
-                } else if (zmiana < 0) {
-                    symbol = '⬇';
-                } else {
-                    symbol = '=';
-                }
+                    if (zmiana > 0) {
+                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/up_icon.svg" alt="Up" style="filter: invert(51%) sepia(92%) saturate(355%) hue-rotate(63deg) brightness(94%) contrast(101%); vertical-align: middle; width: 50%;">'; // Zielony
+                    } else if (zmiana < 0) {
+                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/down.svg" alt="Down" style="filter: invert(19%) sepia(87%) saturate(7498%) hue-rotate(346deg) brightness(100%) contrast(112%); vertical-align: middle; width: 50%;">'; // Czerwony
+                    } else {
+                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/equal.svg" alt="Equal" style="filter: invert(63%) sepia(90%) saturate(1509%) hue-rotate(8deg) brightness(100%) contrast(107%); vertical-align: middle; width: 50%;">'; // Pomarańczowy
+                    }
 
                 const formaArray = forma.split(',');
                 const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
@@ -120,9 +120,9 @@
                         <span class="zmiana"> ${zmiana} </span>
                         <span class="symbol"> ${symbol} </span>
                     </td>
-                    <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"></div> ${zawodnik}</td>
-                    <td>${obst}</td>
-                    <td>${zdob}</td>
+                    <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"><span> ${zawodnik}</span></div></td>
+                    <td><span class="bramki">${obst}</span></td>
+                    <td><span class="bramki">${zdob}</span></td>
                     <td>${roznica}</td>
                     <td class="player-form">
                         <div class="dots-container">
