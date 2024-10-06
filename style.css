@@ -1,7 +1,14 @@
+@font-face {
+    font-family: 'Champions'; /* Nazwa, której będziesz używać */
+    src: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/font/Champions-Bold.ttf') format('truetype'); /* Ścieżka do czcionki na serwerze */
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Champions', sans-serif;
     background: linear-gradient(135deg, #0d0f20, #061c54);
     background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png');
     background-size: cover;
@@ -49,6 +56,7 @@ table.leaderboard {
     background: rgba(0, 39, 102, 0.8);
     border-radius: 10px;
     overflow: hidden;
+    table-layout: fixed;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -68,7 +76,6 @@ table.leaderboard th, table.leaderboard td {
     padding: 6px;
     text-align: center;
     color: white;
-    font-weight: bold;
     font-size: 0.85em;
 }
 
@@ -77,14 +84,16 @@ table.leaderboard td {
 }
 
 table.leaderboard th:nth-child(1), table.leaderboard td:nth-child(1) {
-    width: 15%;
+    width: 10%;
 }
 
-table.leaderboard th:nth-child(2), table.leaderboard td:nth-child(2) {
-    width: 25%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+table.leaderboard th:nth-child(2),
+table.leaderboard td:nth-child(2) {
+    width: 30%;
+    /* Remove display: flex; align-items; justify-content */
+    text-align: left; /* Wyśrodkowanie zawartości */
+    vertical-align: middle; /* Wyśrodkowanie w pionie */
+    white-space: nowrap; /* Zapobiega łamaniu linii */
 }
 
 table.leaderboard th:nth-child(3), table.leaderboard td:nth-child(3) {
@@ -100,18 +109,27 @@ table.leaderboard th:nth-child(5), table.leaderboard td:nth-child(5) {
 }
 
 table.leaderboard th:nth-child(6), table.leaderboard td:nth-child(6) {
-    width: 20%;
+    width: 25%;
 }
 
 table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
     width: 10%;
 }
 
+
+.avatar {
+    display: flex; /* Umożliwia elastyczne układanie elementów */
+    align-items: center; /* Wyśrodkowanie w pionie */
+    gap: 5px; /* Odstęp między avatar i imieniem */
+}
+
 .avatar img {
-    border-radius: 50%;
-    width: 30px;
-    margin-right: 5px;
-    vertical-align: middle;
+    width: 30px; /* Ustaw odpowiednią szerokość */
+}
+
+.avatar span {
+    /* Umożliwia, aby imię było wyśrodkowane w pionie */
+    line-height: normal; /* Ustal linię wysokości równą wysokości avatara */
 }
 
 /* Styl dla zmienionego wiersza */
@@ -181,7 +199,6 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 
 .points .pkt {
     font-size: 1.2em; /* Większy rozmiar czcionki dla punktów */
-    font-weight: bold;
     color: white;
     line-height: 1; /* Zmniejszamy odstępy między liniami */
 }
@@ -194,17 +211,16 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     display: block;
 }
 
-
-.symbol {
+.bramki {
     font-size: 0.9em;
     color: #fff;
     display: inline-block;
     vertical-align: middle;
-    margin-left: 2px;
+    font-weight: normal;
 }
 
 .zmiana {
-    font-size: 0.7em;
+    font-size: 0.9em;
     color: #fff;
     display: inline-block;
     vertical-align: middle;
@@ -288,7 +304,6 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 /* Styl dla wyniku meczu */
 .result {
     color: #fff;
-    font-weight: bold;
     font-size: 0.9em;
 }
 
@@ -389,9 +404,6 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
         font-size: 1em;
     }
 
-    .zmiana {
-        font-size: 0.6em;
-    }
 
     .dot {
         width: 8px;
