@@ -1,0 +1,543 @@
+@font-face {
+    font-family: 'Champions'; /* Nazwa, której będziesz używać */
+    src: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/font/Champions-Bold.ttf') format('truetype'); /* Ścieżka do czcionki na serwerze */
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Champions', sans-serif;
+    background: linear-gradient(135deg, #0d0f20, #061c54);
+    background-image: url('https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/bck.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Styl kontenera */
+.container {
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* Styl nagłówka */
+.header h1, .header h2 {
+    margin: 0;
+    color: #fff;
+}
+
+.header h1 {
+    font-size: 1.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header h2 {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+/* Tabela */
+.table-container {
+    margin-top: 15px;
+}
+
+table.leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0, 39, 102, 0.8);
+    border-radius: 10px;
+    overflow: hidden;
+    table-layout: fixed;
+    opacity: 1;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+table.leaderboard.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+table.leaderboard thead {
+    background-color: #002766;
+    color: #fff;
+}
+
+table.leaderboard th, table.leaderboard td {
+    padding: 6px;
+    text-align: center;
+    color: white;
+    font-size: 0.85em;
+}
+
+table.leaderboard td {
+    vertical-align: middle;
+}
+
+table.leaderboard th:nth-child(1), table.leaderboard td:nth-child(1) {
+    width: 10%;
+}
+
+table.leaderboard th:nth-child(2),
+table.leaderboard td:nth-child(2) {
+    width: 30%;
+    /* Remove display: flex; align-items; justify-content */
+    text-align: left; /* Wyśrodkowanie zawartości */
+    vertical-align: middle; /* Wyśrodkowanie w pionie */
+    white-space: nowrap; /* Zapobiega łamaniu linii */
+}
+
+table.leaderboard th:nth-child(3), table.leaderboard td:nth-child(3) {
+    width: 10%;
+}
+
+table.leaderboard th:nth-child(4), table.leaderboard td:nth-child(4) {
+    width: 10%;
+}
+
+table.leaderboard th:nth-child(5), table.leaderboard td:nth-child(5) {
+    width: 10%;
+}
+
+table.leaderboard th:nth-child(6), table.leaderboard td:nth-child(6) {
+    width: 25%;
+}
+
+table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
+    width: 10%;
+}
+
+
+.avatar {
+    display: flex; /* Umożliwia elastyczne układanie elementów */
+    align-items: center; /* Wyśrodkowanie w pionie */
+    gap: 5px; /* Odstęp między avatar i imieniem */
+}
+
+.avatar img {
+    width: 30px; /* Ustaw odpowiednią szerokość */
+}
+
+.avatar span {
+    /* Umożliwia, aby imię było wyśrodkowane w pionie */
+    line-height: normal; /* Ustal linię wysokości równą wysokości avatara */
+}
+
+/* Styl dla zmienionego wiersza */
+.highlight {
+    background-color: rgba(255, 255, 0, 0.5) !important; /* Żółty z 50% przezroczystości */
+    transition: background-color 0.5s ease;
+}
+
+/* Styl dla wierszy tabeli */
+table.leaderboard tbody tr.player-row {
+    background-color: #0044cc;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+table.leaderboard tbody tr.player-row.fade-in-row {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Alternatywne kolory wierszy */
+table.leaderboard tbody tr.player-row:nth-child(even) {
+    background-color: #003399; /* Ciemniejszy kolor dla parzystych wierszy */
+}
+
+/* Styl dla placeholdera */
+table.leaderboard tbody tr.details-row {
+    display: none; /* Ukryj całkowicie przed rozwinięciem */
+    background-color: rgba(0, 39, 102, 0.8);
+    transition: all 0.3s ease-in-out;
+}
+
+table.leaderboard tbody tr.details-row.expanded {
+    display: table-row; /* Pokaż, gdy rozwinięte */
+}
+
+table.leaderboard tbody tr.details-row td {
+    padding: 0;
+    border-bottom: none;
+}
+
+table.leaderboard tbody tr.details-row .details-placeholder {
+    background-color: rgba(0, 39, 102, 0.8);
+    border-radius: 5px;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+    /* Usunięto max-height i overflow, ponieważ całkowicie ukrywamy/wyświetlamy row */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+table.leaderboard tbody tr.details-row.expanded .details-placeholder {
+    opacity: 1;
+}
+
+/* Styl dla punktów */
+.points {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.points .pkt {
+    font-size: 1.2em; /* Większy rozmiar czcionki dla punktów */
+    color: white;
+    line-height: 1; /* Zmniejszamy odstępy między liniami */
+}
+
+.points .plus-pkt {
+    font-size: 0.75em; /* Mniejszy rozmiar czcionki dla dodatkowych punktów */
+    color: #21e821; /* Zielona czcionka */
+    margin-top: 2px; /* Zmniejszenie odstępu między punktami */
+    text-align: center;
+    display: block;
+}
+
+.bramki {
+    font-size: 0.9em;
+    color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: normal;
+}
+
+.zmiana {
+    font-size: 0.9em;
+    color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 1px;
+}
+
+/* Kontener na kropki z formą zawodników */
+.dots-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.dots-row {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.red {
+    background-color: red;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.green {
+    background-color: green;
+}
+
+/* Styl dla kontenera meczów w placeholderze */
+.matches-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.matches-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Styl dla pojedynczego meczu */
+.match {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    flex: 1 1 calc(11% - 10px); /* 9 meczów w rzędzie: 100% / 9 ≈ 11% */
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.match.fade-in-match {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Styl dla logo drużyn */
+.team-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Styl dla wyniku meczu */
+.result {
+    color: #fff;
+    font-size: 0.9em;
+}
+
+/* Responsywność dla urządzeń mobilnych */
+@media screen and (max-width: 600px) {
+    .match {
+        flex: 1 1 calc(33.33% - 10px); /* Na mniejszych ekranach: 3 mecze w rzędzie */
+        justify-content: center;
+    }
+
+    .team-logo {
+        width: 15px;
+        height: 15px;
+    }
+
+    .result {
+        font-size: 0.8em;
+    }
+
+    .details-placeholder {
+        padding: 10px;
+    }
+
+    /* Dodatkowe responsive adjustments if necessary */
+}
+
+/* Spinner */
+#loading-spinner {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animacja pojawiania się wierszy */
+.fade-in-row {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Animacja pojawiania się meczów */
+@keyframes fadeInMatch {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsywny design dla urządzeń mobilnych */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .header h1 {
+        font-size: 1.5em;
+    }
+
+    .header h2 {
+        font-size: 1em;
+    }
+
+    table.leaderboard th, table.leaderboard td {
+        padding: 4px;
+        font-size: 0.75em;
+    }
+
+
+    .symbol {
+        font-size: 1em;
+    }
+
+
+    .dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .details-placeholder {
+        padding: 10px;
+    }
+}
+
+/* Efekt interakcji dla wiersza gracza */
+.player-row {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.player-row:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Styl dla hamburger menu */
+.hamburger-menu {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.menu-icon {
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.menu-icon:hover {
+    transform: rotate(90deg); /* Efekt obrotu przy najechaniu */
+}
+
+/* Ukryte menu */
+.menu-content {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 40%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Czarne tło z przezroczystością 50% */
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 101;
+    transition: right 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.menu-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.menu-content ul li {
+    margin-bottom: 20px;
+}
+
+.menu-content ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.menu-content ul li a:hover {
+    color: #ffcc00; /* Efekt podświetlenia linku */
+}
+
+/* Styl dla ciemnego tła po otwarciu menu */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px); /* Efekt rozmycia */
+    display: none;
+    z-index: 99;
+    transition: opacity 0.3s ease;
+}
+
+/* Aktywacja ciemnego tła */
+.menu-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Aktywacja menu */
+.menu-content.active {
+    right: 0;
+}
+
+/* Przejście między stronami */
+.menu-link {
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s forwards;
+}
