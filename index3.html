@@ -1,40 +1,13 @@
-<!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MŁMP BetLiga</title>
-    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* Styl dla podświetlenia zmienionych wierszy */
-        .highlight {
-            background-color: #ffff99; /* Jasnożółty kolor */
-            transition: background-color 0.5s ease;
-        }
-
-        /* Styl dla podświetlenia poprawnych wyników meczów */
-        .match.correct {
-            background-color: #045316; /* Jasnozielony kolor */
-            border-radius: 5px;
-        }
-
-        /* Styl dla animacji fade-in dla wierszy szczegółów */
-        .details-row.expanded {
-            display: table-row;
-        }
-
-        .details-row {
-            display: none;
-        }
-
-        /* Animacja dla meczów */
-        @keyframes fadeInMatch {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         
-    </style>
+            </style>
 </head>
 <body>
     <!-- Hamburger menu -->
@@ -84,22 +57,11 @@
             let expandedRows = new Set();
             const currentData = new Map(); // Map to store current player and match data
 
-            // Hamburger Menu Toggle
-            const menuIcon = document.getElementById('menu-icon');
-            const menuContent = document.getElementById('menu-content');
-            const menuOverlay = document.getElementById('menu-overlay');
 
-            menuIcon.addEventListener('click', () => {
-                menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
-                menuOverlay.style.display = menuOverlay.style.display === 'block' ? 'none' : 'block';
-            });
 
-            menuOverlay.addEventListener('click', () => {
-                menuContent.style.display = 'none';
-                menuOverlay.style.display = 'none';
-            });
-
-            // Funkcja pobierająca dane z Google Sheets
+            /**
+             * Funkcja pobierająca dane z Google Sheets
+             */
             async function fetchData() {
                 const apiUrl = 'https://script.google.com/macros/s/AKfycbzKHTwb1o2HzhOS6_OY9M_PRm1jSpEgfb-OIzZ8jVMEmyt9RSU8kx407lCImbMzVCUYNA/exec';
                 try {
@@ -123,19 +85,69 @@
                 }
             }
 
-            // Funkcja generująca wyniki meczów dla wybranego zawodnika
+            /**
+             * Funkcja do parsowania wyniku i stylu
+             * @param {string} resultString - Wynik z dodatkowymi informacjami, np. "2:2/g"
+             * @returns {Object} - Obiekt zawierający wyświetlany wynik i klasę stylu
+             */
+            function parseResult(resultString) {
+                // Sprawdzenie, czy wynik zawiera '/'
+                const separatorIndex = resultString.lastIndexOf('/');
+                if (separatorIndex === -1) {
+                    // Jeśli nie ma '/', zwracamy cały wynik bez stylu
+                    return { displayResult: resultString, style: 'red' }; // Domyślnie czerwony
+                }
+
+                let displayPart = resultString.substring(0, separatorIndex);
+                const styleCode = resultString.substring(separatorIndex + 1).toLowerCase();
+
+                // Opcjonalne: Usuwanie części w nawiasach
+                const parenthesisIndex = displayPart.indexOf('(');
+                if (parenthesisIndex !== -1) {
+                    displayPart = displayPart.substring(0, parenthesisIndex);
+                }
+
+                // Mapowanie kodów stylów na klasy CSS
+                const styleMap = {
+                    'g': 'green',
+                    'y': 'yellow',
+                    'r': 'red'
+                };
+
+                // Mapowanie dla kolorowania czcionki (opcjonalnie)
+                const textStyleMap = {
+                    'g': 'text-green',
+                    'y': 'text-yellow',
+                    'r': 'text-red'
+                };
+
+                return {
+                    displayResult: displayPart.trim(),
+                    backgroundStyle: styleMap[styleCode] || 'red', // Domyślnie czerwony
+                    textStyle: textStyleMap[styleCode] || 'text-red' // Domyślnie czerwony
+                };
+            }
+
+            /**
+             * Funkcja generująca wyniki meczów dla wybranego zawodnika
+             * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
+             * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
+             * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
+             * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
+             */
             function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
                 let matchesHTML = '';
                 for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
                     const row = resultsData[i];
-                    const playerResult = row[zawodnikIndex];
+                    const playerResultWithStyle = row[zawodnikIndex];
                     const wynikResult = row[wynikIndex];
-                    const isCorrect = playerResult === wynikResult;
+                    const parsedResult = parseResult(playerResultWithStyle);
+                    const isCorrect = parsedResult.displayResult === wynikResult;
 
                     matchesHTML += `
-                        <div class="match ${isCorrect ? 'correct' : ''}">
+                        <div class="match ${parsedResult.backgroundStyle}">
                             <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
-                            <span class="result">${playerResult}</span>
+                             ${parsedResult.displayResult}
                             <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
                         </div>
                     `;
@@ -143,7 +155,13 @@
                 return matchesHTML;
             }
 
-            // Funkcja tworząca wiersz zawodnika i wiersz szczegółów
+            /**
+             * Funkcja tworząca wiersz zawodnika i wiersz szczegółów
+             * @param {Array} player - Dane zawodnika.
+             * @param {Array} resultsData - Dane wyników.
+             * @param {number} wynikIndex - Indeks kolumny 'Wynik'.
+             * @returns {Object} - Obiekt zawierający wiersz zawodnika i wiersz szczegółów.
+             */
             function createPlayerRow(player, resultsData, wynikIndex) {
                 const ranking = player[0];
                 const zmiana = player[1];
@@ -237,7 +255,11 @@
                 return { playerRow, detailsRow };
             }
 
-            // Funkcja toggle dla rozwijania i zwijania szczegółów
+            /**
+             * Funkcja toggle dla rozwijania i zwijania szczegółów
+             * @param {string} zawodnik - Nazwa zawodnika.
+             * @param {HTMLElement} detailsRow - Wiersz szczegółów zawodnika.
+             */
             function toggleDetails(zawodnik, detailsRow) {
                 const isExpanded = expandedRows.has(zawodnik);
                 if (isExpanded) {
@@ -254,7 +276,11 @@
                 }
             }
 
-            // Funkcja do generowania symboli na podstawie wartości
+            /**
+             * Funkcja do generowania symboli na podstawie wartości
+             * @param {number} value - Wartość do przekształcenia w symbol.
+             * @returns {string} - HTML ze symbolem.
+             */
             function getSymbol(value) {
                 if (value == 3) {
                     return '<span class="dot green"></span>';
@@ -265,7 +291,10 @@
                 }
             }
 
-            // Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
+            /**
+             * Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
+             * @param {boolean} isInitialLoad - Czy to pierwsze ładowanie danych.
+             */
             async function loadAndDisplayData(isInitialLoad = false) {
                 if (isInitialLoad) {
                     document.getElementById('loading-spinner').style.display = 'flex';
@@ -412,7 +441,11 @@
                 }
             }
 
-            // Funkcja do pobierania indeksu zawodnika w danych Wyniki
+            /**
+             * Funkcja do pobierania indeksu zawodnika w danych Wyniki
+             * @param {string} zawodnik - Nazwa zawodnika.
+             * @returns {number} - Indeks kolumny w danych Wyniki dla danego zawodnika.
+             */
             function getZawodnikIndex(zawodnik) {
                 const mapping = {
                     'Mariusz': 0,
@@ -424,7 +457,9 @@
                 return mapping[zawodnik] !== undefined ? mapping[zawodnik] : -1;
             }
 
-            // Delegacja zdarzeń dla kliknięć w wiersze zawodników
+            /**
+             * Funkcja delegująca zdarzenia dla kliknięć w wiersze zawodników
+             */
             document.getElementById('table-body').addEventListener('click', function(event) {
                 let target = event.target;
 
@@ -442,6 +477,37 @@
                 }
             });
 
+
+            const menuIcon = document.getElementById('menu-icon');
+    const menuContent = document.getElementById('menu-content');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const links = document.querySelectorAll('.menu-link');
+
+    // Funkcja otwierająca i zamykająca menu
+    menuIcon.addEventListener('click', () => {
+        menuContent.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    });
+
+    // Kliknięcie w ciemne tło zamyka menu
+    menuOverlay.addEventListener('click', () => {
+        menuContent.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+    // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
+    menuContent.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.classList.contains('menu-link')) {
+            menuContent.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
+    });
+
+
+            /**
+             * Funkcja inicjująca ładowanie danych
+             */
             window.onload = () => loadAndDisplayData(true);
             setInterval(() => loadAndDisplayData(false), 15000);
         </script>
