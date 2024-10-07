@@ -449,7 +449,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 40%;
+    width: 50%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Czarne tło z przezroczystością 50% */
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
@@ -513,7 +513,57 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     overflow: hidden;
 }
 
+/* Styl dla podświetlenia zmienionych wierszy */
+.highlight {
+    background-color: #ffff99; /* Jasnożółty kolor */
+    transition: background-color 0.5s ease;
+}
 
+/* Styl dla podświetlenia poprawnych wyników meczów */
+.match.green {
+    background-color:#057c05; /* Jasnozielony kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia trafionych kategorii */
+.match.yellow {
+    background-color: #a79907; /* Jasnożółty kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia nietrafionych wyników */
+.match.red {
+    background-color: #a10808; /* Jasnoczerwony kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla animacji fade-in dla wierszy szczegółów */
+.details-row.expanded {
+    display: table-row;
+}
+
+.details-row {
+    display: none;
+}
+
+/* Animacja dla meczów */
+@keyframes fadeInMatch {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Opcjonalnie: Klasy dla kolorowania czcionki */
+.text-green {
+    color: #2e7d32; /* Zielony */
+}
+
+.text-yellow {
+    color: #f9a825; /* Żółty */
+}
+
+.text-red {
+    color: #c62828; /* Czerwony */
+}
 
 
 @keyframes fadeOut {
