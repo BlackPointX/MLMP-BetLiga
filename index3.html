@@ -144,11 +144,16 @@
                     const parsedResult = parseResult(playerResultWithStyle);
                     const isCorrect = parsedResult.displayResult === wynikResult;
 
+                     // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
+                     const leftTeamLogo = row[4];  // Logo lewej drużyny
+                     const rightTeamLogo = row[5]; // Logo prawej drużyny
+
+
                     matchesHTML += `
                         <div class="match ${parsedResult.backgroundStyle}">
-                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
-                             ${parsedResult.displayResult}
-                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
+                            <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
+                                 ${parsedResult.displayResult}
+                            <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
                         </div>
                     `;
                 }
