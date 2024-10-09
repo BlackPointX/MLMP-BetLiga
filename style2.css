@@ -295,10 +295,9 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 
 /* Styl dla logo drużyn */
 .team-logo {
-    width: 20px;
     height: 20px;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: 0%;
 }
 
 /* Styl dla wyniku meczu */
@@ -314,10 +313,6 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
         justify-content: center;
     }
 
-    .team-logo {
-        width: 15px;
-        height: 15px;
-    }
 
     .result {
         font-size: 0.8em;
