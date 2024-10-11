@@ -586,3 +586,119 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 .fade-in {
     animation: fadeIn 0.5s forwards;
 }
+
+
+/* Modal styles */
+.match-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Zwiększona przezroczystość */
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #0d0f20, #061c54);
+    padding: 20px;
+    border-radius: 12px; /* Zaokrąglone rogi */
+    max-width: 700px; /* Większe okienko */
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s ease;
+    text-align: center;
+    position: relative;
+    font-size: 20px; /* Rozmiar czcionki */
+    color: white;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    color: #fff; /* Biały kolor przycisku zamknięcia */
+    cursor: pointer;
+}
+
+.main-match-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.team-logo-large {
+    width: 80px; /* Zmniejszenie logo drużyn */
+    height: 80px;
+}
+
+#match-result-large {
+    font-size: 3em; /* Powiększony wynik meczu */
+    font-weight: bold;
+}
+
+.additional-matches .row {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    gap: 15px; /* Odstępy między rzędami */
+}
+
+/* Zaktualizowane stylowanie dla avatarów bez imion */
+.player-avatar {
+    width: 20%;
+    object-fit: cover;
+}
+
+/* Styl dla mniejszych wyników */
+.small-match {
+    background-color: #1a1a3d;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Utrzymanie dystansu między elementami */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.small-match img {
+    width: 30px;
+    height: 30px;
+}
+
+.small-match-result {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Kolorowanie tła na podstawie wyniku */
+.small-match.green {
+    background-color: #28a745;
+}
+
+.small-match.red {
+    background-color: #dc3545;
+}
+
+.small-match.yellow {
+    background-color: #ffc107;
+}
+
+.small-match.default {
+    background-color: #002766;
+}
+
+.team-logo-small {
+    width: 35px;
+    height: 35px;
+}
