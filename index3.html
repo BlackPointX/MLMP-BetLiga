@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MŁMP BetLiga</title>
-    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         
             </style>
@@ -128,37 +128,140 @@
                 };
             }
 
-            /**
-             * Funkcja generująca wyniki meczów dla wybranego zawodnika
-             * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
-             * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
-             * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
-             * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
-             */
-            function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
-                let matchesHTML = '';
-                for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
-                    const row = resultsData[i];
-                    const playerResultWithStyle = row[zawodnikIndex];
-                    const wynikResult = row[wynikIndex];
-                    const parsedResult = parseResult(playerResultWithStyle);
-                    const isCorrect = parsedResult.displayResult === wynikResult;
+          /**
+ * Funkcja generująca wyniki meczów dla wybranego zawodnika
+ * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
+ * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
+ * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
+ * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
+ */
+ function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
+    let matchesHTML = '';
+    for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
+        const row = resultsData[i];
+        const playerResultWithStyle = row[zawodnikIndex];
+        const wynikResult = row[wynikIndex];
+        const parsedResult = parseResult(playerResultWithStyle); // Zachowujemy przetwarzanie wyników
 
-                     // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
-                     const leftTeamLogo = row[4];  // Logo lewej drużyny
-                     const rightTeamLogo = row[5]; // Logo prawej drużyny
+        // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
+        const leftTeamLogo = row[4];  // Logo lewej drużyny
+        const rightTeamLogo = row[5]; // Logo prawej drużyny
+
+        // Dodajemy wynik w tabeli z odpowiednimi stylami
+        matchesHTML += `
+            <div class="match ${parsedResult.backgroundStyle}" 
+                 data-result="${parsedResult.displayResult}" 
+                 data-left-logo="${leftTeamLogo}" 
+                 data-right-logo="${rightTeamLogo}" 
+                 data-match-index="${i}">
+                <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
+                ${parsedResult.displayResult}
+                <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
+            </div>
+        `;
+    }
+
+    // Obsługa kliknięcia na wyniki meczów
+    setTimeout(() => {
+        document.querySelectorAll('.match').forEach(match => {
+            match.addEventListener('click', function() {
+                const matchIndex = this.getAttribute('data-match-index'); // Pobierz indeks meczu
+                openMatchModal(this, resultsData, matchIndex); // Przekazujemy dane o meczu
+            });
+        });
+    }, 100);
+
+    return matchesHTML;
+}
 
 
-                    matchesHTML += `
-                        <div class="match ${parsedResult.backgroundStyle}">
-                            <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
-                                 ${parsedResult.displayResult}
-                            <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
-                        </div>
-                    `;
-                }
-                return matchesHTML;
-            }
+
+/**
+ * Funkcja otwierająca okienko z wynikami meczów
+ * @param {HTMLElement} matchElement - Element meczu, na który kliknięto.
+ */
+ function openMatchModal(matchElement, resultsData, matchIndex) {
+    const leftLogo = resultsData[matchIndex][4]; // Pobierz logo lewej drużyny
+    const rightLogo = resultsData[matchIndex][5]; // Pobierz logo prawej drużyny
+    const realMatchResult = resultsData[matchIndex][6]; // Pobierz rzeczywisty wynik
+
+    // Ustawiamy duży wynik i loga
+    document.getElementById('left-team-logo-large').src = leftLogo;
+    document.getElementById('right-team-logo-large').src = rightLogo;
+    document.getElementById('match-result-large').textContent = realMatchResult;
+
+    const avatars = [
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png'
+    ];
+
+    // Pobierz wyniki 4 graczy dla tego meczu
+    const resultsForMatch = resultsData[matchIndex].slice(0, 4);
+
+    // Wyświetl mniejsze wyniki dla graczy
+    for (let i = 1; i <= 4; i++) {
+        const parsedResult = parseResult(resultsForMatch[i - 1]); // Przetwarzamy wynik
+
+        // Ustawiamy wynik bez sufiksu
+        document.getElementById(`small-match-result-${i}`).textContent = parsedResult.displayResult;
+
+        // Kolorujemy box na podstawie sufiksu
+        const smallMatchElement = document.getElementById(`small-match-${i}`);
+        smallMatchElement.className = `small-match ${parsedResult.backgroundStyle}`; // Ustaw kolor
+
+        // Ustaw avatary graczy
+        document.getElementById(`player-avatar-${i}`).src = avatars[i - 1];
+
+        // Ustaw loga drużyn
+        document.getElementById(`small-left-logo-${i}`).src = leftLogo;
+        document.getElementById(`small-right-logo-${i}`).src = rightLogo;
+    }
+
+    // Wyświetlamy modalne okno
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'flex';
+
+    // Obsługa zamykania modalnego okna po kliknięciu
+    modal.addEventListener('click', closeMatchModal);
+}
+
+
+
+
+/**
+ * Funkcja do usuwania sufiksu z wyniku (np. "3:1/g" -> "3:1")
+ * @param {string} result - Wynik z sufiksem.
+ * @returns {string} - Wynik bez sufiksu.
+ */
+function removeSuffix(result) {
+    const separatorIndex = result.lastIndexOf('/');
+    if (separatorIndex === -1) {
+        return result; // Jeśli nie ma sufiksu, zwracamy oryginalny wynik
+    }
+    return result.substring(0, separatorIndex); // Usuwamy część po "/"
+}
+
+
+
+
+/**
+ * Funkcja zamykająca okienko z wynikami
+ */
+function closeMatchModal() {
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'none';
+}
+
+/**
+ * Funkcja zamykająca okienko z wynikami
+ */
+function closeMatchModal() {
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'none';
+}
+
 
             /**
              * Funkcja tworząca wiersz zawodnika i wiersz szczegółów
@@ -188,8 +291,14 @@
                 }
 
                 const formaArray = forma.split(',');
-                const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
-                const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+
+                // Obliczamy ile elementów powinno być w górnym rzędzie (więcej w górnym, jeśli nieparzysta liczba)
+                const half = Math.ceil(formaArray.length / 2);
+
+                const row1 = formaArray.slice(0, half).map(val => getSymbol(val)).join('');
+                const row2 = formaArray.slice(half).map(val => getSymbol(val)).join('');
+
+
 
                 let avatarUrl;
                 let zawodnikIndex;
@@ -232,9 +341,10 @@
                     <td class="player-form">
                         <div class="dots-container">
                             <div class="dots-row">${row1}</div>
-                            <div class="dots-row">${row2}</div>
+                            ${row2 ? `<div class="dots-row">${row2}</div>` : ''}
                         </div>
                     </td>
+
                     <td class="points">
                         <span class="pkt">${pkt}</span>
                         <span class="plus-pkt">${plusPkt}</span>
@@ -517,5 +627,61 @@
             setInterval(() => loadAndDisplayData(false), 60000);
         </script>
     </div>
+
+
+    <!-- Modal window -->
+            <div id="match-modal" class="match-modal">
+                <div class="modal-content" id="modal-content">
+                    <span class="close-button" id="close-modal">&times;</span>
+                    <div class="main-match-result">
+                        <img src="" alt="Left Team Logo" class="team-logo-large" id="left-team-logo-large">
+                        <span id="match-result-large"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-large" id="right-team-logo-large">
+                    </div>
+                    <div class="additional-matches">
+                        <div class="row">
+                            <div class="small-match" id="small-match-1">
+                                <div class="player-info">
+                                    <img src="" alt="Player 1 Avatar" class="player-avatar" id="player-avatar-1">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-1">
+                                <span id="small-match-result-1"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-1">
+                            </div>
+                            <div class="small-match" id="small-match-2">
+                                <div class="player-info">
+                                    <img src="" alt="Player 2 Avatar" class="player-avatar" id="player-avatar-2">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-2">
+                                <span id="small-match-result-2"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-2">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-match" id="small-match-3">
+                                <div class="player-info">
+                                    <img src="" alt="Player 3 Avatar" class="player-avatar" id="player-avatar-3">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-3">
+                                <span id="small-match-result-3"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-3">
+                            </div>
+                            <div class="small-match" id="small-match-4">
+                                <div class="player-info">
+                                    <img src="" alt="Player 4 Avatar" class="player-avatar" id="player-avatar-4">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-4">
+                                <span id="small-match-result-4"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-4">
+                            </div>
+                        </div>
+                        
+                    </div>
+                   
+                </div>
+            </div>
+
+
+        
 </body>
 </html>
