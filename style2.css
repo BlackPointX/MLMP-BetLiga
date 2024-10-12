@@ -291,6 +291,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 .match.fade-in-match {
     opacity: 1;
     transform: translateY(0);
+    animation: fadeInMatch 1s ease forwards, blink-border 1s infinite; /* Zastosowanie obu animacji */
 }
 
 /* Styl dla logo drużyn */
@@ -702,3 +703,58 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     width: 35px;
     height: 35px;
 }
+
+/* Migające zielone obramowanie */
+.blink-green {
+    animation: blink-border-green 1s infinite;
+    border: 4px solid rgba(0, 255, 0, 0.6); /* Początkowe zielone obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-green {
+    0% {
+        border-color: rgba(0, 255, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(0, 255, 0, 0);
+    }
+    100% {
+        border-color: rgba(0, 255, 0, 0.6);
+    }
+}
+
+/* Migające żółte obramowanie */
+.blink-yellow {
+    animation: blink-border-yellow 1s infinite;
+    border: 4px solid rgba(255, 255, 0, 0.6); /* Początkowe żółte obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-yellow {
+    0% {
+        border-color: rgba(255, 255, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(255, 255, 0, 0);
+    }
+    100% {
+        border-color: rgba(255, 255, 0, 0.6);
+    }
+}
+
+/* Migające czerwone obramowanie */
+.blink-red {
+    animation: blink-border-red 1s infinite;
+    border: 4px solid rgba(255, 0, 0, 0.6); /* Początkowe czerwone obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-red {
+    0% {
+        border-color: rgba(255, 0, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(255, 0, 0, 0);
+    }
+    100% {
+        border-color: rgba(255, 0, 0, 0.6);
+    }
+}
+
