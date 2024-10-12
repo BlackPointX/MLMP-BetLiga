@@ -18,7 +18,7 @@
         </div>
         <nav class="menu-content" id="menu-content">
             <ul>
-                <li><a href="index3.html" class="menu-link">Link do lm (wyłączony)</a></li>
+                <li><a href="index.html" class="menu-link">Champions League Edition</a></li>
             </ul>
         </nav>
     </div>
@@ -111,7 +111,10 @@
                 const styleMap = {
                     'g': 'green',
                     'y': 'yellow',
-                    'r': 'red'
+                    'r': 'red',
+                    'gl': 'blink-green',  // Migający zielony
+                    'yl': 'blink-yellow', // Migający żółty
+                    'rl': 'blink-red'     // Migający czerwony
                 };
 
                 // Mapowanie dla kolorowania czcionki (opcjonalnie)
@@ -375,21 +378,36 @@ function closeMatchModal() {
              * @param {string} zawodnik - Nazwa zawodnika.
              * @param {HTMLElement} detailsRow - Wiersz szczegółów zawodnika.
              */
-            function toggleDetails(zawodnik, detailsRow) {
-                const isExpanded = expandedRows.has(zawodnik);
-                if (isExpanded) {
-                    detailsRow.classList.remove('expanded');
-                    expandedRows.delete(zawodnik);
-                } else {
-                    detailsRow.classList.add('expanded');
-                    expandedRows.add(zawodnik);
+             function toggleDetails(zawodnik, detailsRow) {
+    const isExpanded = expandedRows.has(zawodnik);
+    if (isExpanded) {
+        detailsRow.classList.remove('expanded');
+        expandedRows.delete(zawodnik);
+    } else {
+        detailsRow.classList.add('expanded');
+        expandedRows.add(zawodnik);
 
-                    const matches = detailsRow.querySelectorAll('.match');
-                    matches.forEach((match, index) => {
-                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
-                    });
-                }
-            }
+        // Trigger a reflow to ensure the animation starts after expansion
+        const matches = detailsRow.querySelectorAll('.match');
+        matches.forEach((match, index) => {
+            match.style.animation = 'none'; // Reset the animation
+            match.offsetHeight; // Force reflow
+
+            // Pobieranie aktualnej klasy animacji (może być 'blink-red', 'blink-green', 'blink-yellow')
+            const backgroundStyle = match.classList.contains('blink-red') 
+                                    ? 'blink-border-red' 
+                                    : match.classList.contains('blink-green') 
+                                    ? 'blink-border-green' 
+                                    : match.classList.contains('blink-yellow') 
+                                    ? 'blink-border-yellow' 
+                                    : '';
+
+            // Przypisanie odpowiedniej animacji
+            match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s, ${backgroundStyle} 1s infinite`; 
+        });
+    }
+}
+
 
             /**
              * Funkcja do generowania symboli na podstawie wartości
