@@ -8,17 +8,17 @@
 </head>
 <body>
     <!-- Hamburger menu -->
-<div class="menu-overlay" id="menu-overlay"></div>
-<div class="hamburger-menu">
-    <div class="menu-icon" id="menu-icon">
-        &#9776; <!-- Symbol hamburgera -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="hamburger-menu">
+        <div class="menu-icon" id="menu-icon">
+            &#9776; <!-- Symbol hamburgera -->
+        </div>
+        <nav class="menu-content" id="menu-content">
+            <ul>
+                <li><a href="Index2.html" class="menu-link">MŁMP Bet Liga</a></li>
+            </ul>
+        </nav>
     </div>
-    <nav class="menu-content" id="menu-content">
-        <ul>
-            <li><a href="index3.html" class="menu-link">MŁMP Bet Liga</a></li>
-        </ul>
-    </nav>
-</div>
 
     <div class="container">
         <div class="header">
@@ -51,24 +51,226 @@
         </div>
 
         <script>
-            let expandedRows = new Set(); // Przechowuje rozwinięte wiersze
+            let expandedRows = new Set();
+            const currentData = new Map(); // Map to store current player and match data
 
-            // Funkcja generująca wyniki meczów
-            function generateMatchesHTML() {
-                let matchesHTML = '';
-                for (let i = 0; i < 9; i++) {
-                    matchesHTML += `
-                        <div class="match">
-                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
-                            <span class="result">1:1</span>
-                            <img src="https://i.pinimg.com/736x/05/64/e2/0564e2514b9d8694cc8a34d04963e1a4.jpg" alt="Team Logo" class="team-logo">
-                        </div>
-                    `;
+
+
+            /**
+             * Funkcja pobierająca dane z Google Sheets
+             */
+            async function fetchData() {
+                const apiUrl = 'https://script.google.com/macros/s/AKfycbyr4gVCSGs93yIMMd1ogqiR-EOL7sAgMIgf4izRBce_zJIUSwT1ZyaTo6yvS0M8xy8MTg/exec';
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error('Błąd podczas pobierania danych');
+                    }
+                    const data = await response.json();
+                    console.log("Dane zawodników (WWW):", data.WWW); // Wyświetlenie danych zawodników
+                    console.log("Dane wyników (Wyniki):", data.Wyniki); // Wyświetlenie danych wyników
+
+                    // Sprawdzanie, czy dane istnieją
+                    if (!data.WWW || !data.Wyniki) {
+                        throw new Error('Dane z arkusza są niekompletne lub niepoprawne.');
+                    }
+
+                    return data;  // Zwracamy obiekt z danymi z obu arkuszy
+                } catch (error) {
+                    console.error('Błąd podczas pobierania danych:', error);
+                    return null;
                 }
-                return matchesHTML;
             }
 
-            function createPlayerRow(player) {
+            /**
+             * Funkcja do parsowania wyniku i stylu
+             * @param {string} resultString - Wynik z dodatkowymi informacjami, np. "2:2/g"
+             * @returns {Object} - Obiekt zawierający wyświetlany wynik i klasę stylu
+             */
+            function parseResult(resultString) {
+                // Sprawdzenie, czy wynik zawiera '/'
+                const separatorIndex = resultString.lastIndexOf('/');
+                if (separatorIndex === -1) {
+                    // Jeśli nie ma '/', zwracamy cały wynik bez stylu
+                    return { displayResult: resultString, style: 'red' }; // Domyślnie czerwony
+                }
+
+                let displayPart = resultString.substring(0, separatorIndex);
+                const styleCode = resultString.substring(separatorIndex + 1).toLowerCase();
+
+                // Opcjonalne: Usuwanie części w nawiasach
+                const parenthesisIndex = displayPart.indexOf('(');
+                if (parenthesisIndex !== -1) {
+                    displayPart = displayPart.substring(0, parenthesisIndex);
+                }
+
+                // Mapowanie kodów stylów na klasy CSS
+                const styleMap = {
+                    'g': 'green',
+                    'y': 'yellow',
+                    'r': 'red',
+                    'gl': 'blink-green',  // Migający zielony
+                    'yl': 'blink-yellow', // Migający żółty
+                    'rl': 'blink-red'     // Migający czerwony
+                };
+
+                // Mapowanie dla kolorowania czcionki (opcjonalnie)
+                const textStyleMap = {
+                    'g': 'text-green',
+                    'y': 'text-yellow',
+                    'r': 'text-red'
+                };
+
+                return {
+                    displayResult: displayPart.trim(),
+                    backgroundStyle: styleMap[styleCode] || 'red', // Domyślnie czerwony
+                    textStyle: textStyleMap[styleCode] || 'text-red' // Domyślnie czerwony
+                };
+            }
+
+          /**
+ * Funkcja generująca wyniki meczów dla wybranego zawodnika
+ * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
+ * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
+ * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
+ * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
+ */
+ function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
+    let matchesHTML = '';
+    for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
+        const row = resultsData[i];
+        const playerResultWithStyle = row[zawodnikIndex];
+        const wynikResult = row[wynikIndex];
+        const parsedResult = parseResult(playerResultWithStyle); // Zachowujemy przetwarzanie wyników
+
+        // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
+        const leftTeamLogo = row[4];  // Logo lewej drużyny
+        const rightTeamLogo = row[5]; // Logo prawej drużyny
+
+        // Dodajemy wynik w tabeli z odpowiednimi stylami
+        matchesHTML += `
+            <div class="match ${parsedResult.backgroundStyle}" 
+                 data-result="${parsedResult.displayResult}" 
+                 data-left-logo="${leftTeamLogo}" 
+                 data-right-logo="${rightTeamLogo}" 
+                 data-match-index="${i}">
+                <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
+                ${parsedResult.displayResult}
+                <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
+            </div>
+        `;
+    }
+
+    // Obsługa kliknięcia na wyniki meczów
+    setTimeout(() => {
+        document.querySelectorAll('.match').forEach(match => {
+            match.addEventListener('click', function() {
+                const matchIndex = this.getAttribute('data-match-index'); // Pobierz indeks meczu
+                openMatchModal(this, resultsData, matchIndex); // Przekazujemy dane o meczu
+            });
+        });
+    }, 100);
+
+    return matchesHTML;
+}
+
+
+
+/**
+ * Funkcja otwierająca okienko z wynikami meczów
+ * @param {HTMLElement} matchElement - Element meczu, na który kliknięto.
+ */
+ function openMatchModal(matchElement, resultsData, matchIndex) {
+    const leftLogo = resultsData[matchIndex][4]; // Pobierz logo lewej drużyny
+    const rightLogo = resultsData[matchIndex][5]; // Pobierz logo prawej drużyny
+    const realMatchResult = resultsData[matchIndex][6]; // Pobierz rzeczywisty wynik
+
+    // Ustawiamy duży wynik i loga
+    document.getElementById('left-team-logo-large').src = leftLogo;
+    document.getElementById('right-team-logo-large').src = rightLogo;
+    document.getElementById('match-result-large').textContent = realMatchResult;
+
+    const avatars = [
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png',
+        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png'
+    ];
+
+    // Pobierz wyniki 4 graczy dla tego meczu
+    const resultsForMatch = resultsData[matchIndex].slice(0, 4);
+
+    // Wyświetl mniejsze wyniki dla graczy
+    for (let i = 1; i <= 4; i++) {
+        const parsedResult = parseResult(resultsForMatch[i - 1]); // Przetwarzamy wynik
+
+        // Ustawiamy wynik bez sufiksu
+        document.getElementById(`small-match-result-${i}`).textContent = parsedResult.displayResult;
+
+        // Kolorujemy box na podstawie sufiksu
+        const smallMatchElement = document.getElementById(`small-match-${i}`);
+        smallMatchElement.className = `small-match ${parsedResult.backgroundStyle}`; // Ustaw kolor
+
+        // Ustaw avatary graczy
+        document.getElementById(`player-avatar-${i}`).src = avatars[i - 1];
+
+        // Ustaw loga drużyn
+        document.getElementById(`small-left-logo-${i}`).src = leftLogo;
+        document.getElementById(`small-right-logo-${i}`).src = rightLogo;
+    }
+
+    // Wyświetlamy modalne okno
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'flex';
+
+    // Obsługa zamykania modalnego okna po kliknięciu
+    modal.addEventListener('click', closeMatchModal);
+}
+
+
+
+
+/**
+ * Funkcja do usuwania sufiksu z wyniku (np. "3:1/g" -> "3:1")
+ * @param {string} result - Wynik z sufiksem.
+ * @returns {string} - Wynik bez sufiksu.
+ */
+function removeSuffix(result) {
+    const separatorIndex = result.lastIndexOf('/');
+    if (separatorIndex === -1) {
+        return result; // Jeśli nie ma sufiksu, zwracamy oryginalny wynik
+    }
+    return result.substring(0, separatorIndex); // Usuwamy część po "/"
+}
+
+
+
+
+/**
+ * Funkcja zamykająca okienko z wynikami
+ */
+function closeMatchModal() {
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'none';
+}
+
+/**
+ * Funkcja zamykająca okienko z wynikami
+ */
+function closeMatchModal() {
+    const modal = document.getElementById('match-modal');
+    modal.style.display = 'none';
+}
+
+
+            /**
+             * Funkcja tworząca wiersz zawodnika i wiersz szczegółów
+             * @param {Array} player - Dane zawodnika.
+             * @param {Array} resultsData - Dane wyników.
+             * @param {number} wynikIndex - Indeks kolumny 'Wynik'.
+             * @returns {Object} - Obiekt zawierający wiersz zawodnika i wiersz szczegółów.
+             */
+            function createPlayerRow(player, resultsData, wynikIndex) {
                 const ranking = player[0];
                 const zmiana = player[1];
                 const zawodnik = player[2];
@@ -80,64 +282,76 @@
                 const plusPkt = player[8];
 
                 let symbol;
-                    if (zmiana > 0) {
-                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/up_icon.svg" alt="Up" style="filter: invert(51%) sepia(92%) saturate(355%) hue-rotate(63deg) brightness(94%) contrast(101%);">'; // Zielony
-                    } else if (zmiana < 0) {
-                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/down.svg" alt="Down" style="filter: invert(19%) sepia(87%) saturate(7498%) hue-rotate(346deg) brightness(100%) contrast(112%);">'; // Czerwony
-                    } else {
-                        symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/equal.svg" alt="Equal" style="filter: invert(63%) sepia(90%) saturate(1509%) hue-rotate(8deg) brightness(100%) contrast(107%);">'; // Pomarańczowy
-                    }
-
-
+                if (zmiana > 0) {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/up_icon.svg" alt="Up" style="filter: invert(51%) sepia(92%) saturate(355%) hue-rotate(63deg) brightness(94%) contrast(101%); vertical-align: middle; width: 50%;">'; // Zielony
+                } else if (zmiana < 0) {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/down.svg" alt="Down" style="filter: invert(19%) sepia(87%) saturate(7498%) hue-rotate(346deg) brightness(100%) contrast(112%); vertical-align: middle; width: 50%;">'; // Czerwony
+                } else {
+                    symbol = '<img src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/equal.svg" alt="Equal" style="filter: invert(63%) sepia(90%) saturate(1509%) hue-rotate(8deg) brightness(100%) contrast(107%); vertical-align: middle; width: 50%;">'; // Pomarańczowy
+                }
 
                 const formaArray = forma.split(',');
-                const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
-                const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
+
+                // Obliczamy ile elementów powinno być w górnym rzędzie (więcej w górnym, jeśli nieparzysta liczba)
+                const half = Math.ceil(formaArray.length / 2);
+
+                const row1 = formaArray.slice(0, half).map(val => getSymbol(val)).join('');
+                const row2 = formaArray.slice(half).map(val => getSymbol(val)).join('');
+
+
 
                 let avatarUrl;
-                switch(zawodnik) {
+                let zawodnikIndex;
+                switch (zawodnik) {
                     case 'Mariusz':
                         avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png';
+                        zawodnikIndex = 0; // Indeks kolumny w danych wyników dla Mariusza
                         break;
                     case 'Łukasz':
                         avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png';
+                        zawodnikIndex = 1; // Indeks kolumny w danych wyników dla Łukasza
                         break;
                     case 'Mateusz':
                         avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png';
+                        zawodnikIndex = 2; // Indeks kolumny w danych wyników dla Mateusza
                         break;
                     case 'Patryk':
                         avatarUrl = 'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png';
+                        zawodnikIndex = 3; // Indeks kolumny w danych wyników dla Patryka
                         break;
                     default:
                         avatarUrl = 'https://via.placeholder.com/40';
+                        zawodnikIndex = -1;
                 }
 
-                // Create player row
                 const playerRow = document.createElement('tr');
                 playerRow.classList.add('player-row', 'fade-in-row');
                 playerRow.setAttribute('data-zawodnik', zawodnik);
+                playerRow.setAttribute('data-ranking', ranking); // Dodanie atrybutu do sortowania
                 playerRow.innerHTML = `
                     <td>
-                        ${ranking}
+                        <span class="ranking">${ranking} </span>
                         <span class="zmiana"> ${zmiana} </span>
                         <span class="symbol"> ${symbol} </span>
                     </td>
                     <td><div class="avatar"><img src="${avatarUrl}" alt="avatar"><span> ${zawodnik}</span></div></td>
-                    <td>${obst}</td>
-                    <td>${zdob}</td>
-                    <td>${roznica}</td>
+                    <td><span class="bramki">${obst}</span></td>
+                    <td><span class="bramki">${zdob}</span></td>
+                    <td><span class="bramki">${roznica}</span></td>
                     <td class="player-form">
                         <div class="dots-container">
                             <div class="dots-row">${row1}</div>
-                            <div class="dots-row">${row2}</div>
+                            ${row2 ? `<div class="dots-row">${row2}</div>` : ''}
                         </div>
                     </td>
+
                     <td class="points">
                         <span class="pkt">${pkt}</span>
                         <span class="plus-pkt">${plusPkt}</span>
                     </td>
                 `;
-                // Create placeholder row
+
+                // Generowanie wyników meczów dla tego zawodnika
                 const detailsRow = document.createElement('tr');
                 detailsRow.classList.add('details-row');
                 detailsRow.setAttribute('data-zawodnik', zawodnik);
@@ -146,48 +360,57 @@
                         <div class="details-placeholder">
                             <div class="matches-container">
                                 <div class="matches-row">
-                                    ${generateMatchesHTML()}
-                                </div>
-                                <div class="matches-row">
-                                    ${generateMatchesHTML()}
+                                    ${zawodnikIndex !== -1 ? generateMatchesHTML(resultsData, zawodnikIndex, 4) : '<p>Brak danych meczowych.</p>'}
                                 </div>
                             </div>
                         </div>
                     </td>
                 `;
 
-                // Add event listener to toggle placeholder
-                playerRow.addEventListener('click', () => {
-                    toggleDetails(zawodnik, detailsRow);
-                });
-
-                return {playerRow, detailsRow};
+                return { playerRow, detailsRow };
             }
 
-            function toggleDetails(zawodnik, detailsRow) {
-                const isExpanded = expandedRows.has(zawodnik);
-                if (isExpanded) {
-                    detailsRow.classList.remove('expanded');
-                    expandedRows.delete(zawodnik);
-                } else {
-                    // Zamyka inne rozwinięte placeholdery
-                    expandedRows.forEach(otherZawodnik => {
-                        const otherDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${otherZawodnik}"]`);
-                        if (otherDetailsRow) {
-                            otherDetailsRow.classList.remove('expanded');
-                        }
-                    });
-                    detailsRow.classList.add('expanded');
-                    expandedRows.add(zawodnik);
+            /**
+             * Funkcja toggle dla rozwijania i zwijania szczegółów
+             * @param {string} zawodnik - Nazwa zawodnika.
+             * @param {HTMLElement} detailsRow - Wiersz szczegółów zawodnika.
+             */
+             function toggleDetails(zawodnik, detailsRow) {
+    const isExpanded = expandedRows.has(zawodnik);
+    if (isExpanded) {
+        detailsRow.classList.remove('expanded');
+        expandedRows.delete(zawodnik);
+    } else {
+        detailsRow.classList.add('expanded');
+        expandedRows.add(zawodnik);
 
-                    // Dodanie animacji pojawiania się meczów
-                    const matches = detailsRow.querySelectorAll('.match');
-                    matches.forEach((match, index) => {
-                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
-                    });
-                }
-            }
+        // Trigger a reflow to ensure the animation starts after expansion
+        const matches = detailsRow.querySelectorAll('.match');
+        matches.forEach((match, index) => {
+            match.style.animation = 'none'; // Reset the animation
+            match.offsetHeight; // Force reflow
 
+            // Pobieranie aktualnej klasy animacji (może być 'blink-red', 'blink-green', 'blink-yellow')
+            const backgroundStyle = match.classList.contains('blink-red') 
+                                    ? 'blink-border-red' 
+                                    : match.classList.contains('blink-green') 
+                                    ? 'blink-border-green' 
+                                    : match.classList.contains('blink-yellow') 
+                                    ? 'blink-border-yellow' 
+                                    : '';
+
+            // Przypisanie odpowiedniej animacji
+            match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s, ${backgroundStyle} 1s infinite`; 
+        });
+    }
+}
+
+
+            /**
+             * Funkcja do generowania symboli na podstawie wartości
+             * @param {number} value - Wartość do przekształcenia w symbol.
+             * @returns {string} - HTML ze symbolem.
+             */
             function getSymbol(value) {
                 if (value == 3) {
                     return '<span class="dot green"></span>';
@@ -198,26 +421,25 @@
                 }
             }
 
-            function highlightRow(row) {
-                row.classList.add('highlight');
-                setTimeout(() => {
-                    row.classList.remove('highlight');
-                }, 5000);
-            }
-
-            async function fetchData(isInitialLoad = false) {
+            /**
+             * Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
+             * @param {boolean} isInitialLoad - Czy to pierwsze ładowanie danych.
+             */
+            async function loadAndDisplayData(isInitialLoad = false) {
                 if (isInitialLoad) {
                     document.getElementById('loading-spinner').style.display = 'flex';
                 }
 
-                const apiUrl = 'https://script.google.com/macros/s/AKfycbyiwdE4GYJ_LbSZN8t5Z8dEg9seqnlB70tSyKnPc4lIF7chlFTMuUT_PQD-3KQDtTEK6w/exec';
+                const data = await fetchData();  // Pobranie danych z obu arkuszy: WWW i Wyniki
+
+                if (!data) {
+                    console.error('Brak danych do wyświetlenia.');
+                    return;
+                }
 
                 try {
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
+                    const playersData = data.WWW;
+                    const resultsData = data.Wyniki;
                     const tableBody = document.getElementById('table-body');
 
                     if (isInitialLoad) {
@@ -225,88 +447,123 @@
                         document.querySelector('table.leaderboard').classList.add('fade-in');
                     }
 
-                    // Przetwarzanie każdego wiersza danych
-                    data.slice(1).forEach((row) => {
-                        const ranking = row[0];
-                        const zmiana = row[1];
+                    // Tworzenie mapy nowych danych dla łatwego dostępu
+                    const newDataMap = new Map();
+                    playersData.slice(1).forEach((row) => { // Pomijamy nagłówek
                         const zawodnik = row[2];
-                        const obst = row[3];
-                        const zdob = row[4];
-                        const roznica = row[5];
-                        const forma = row[6];
-                        const pkt = row[7];
-                        const plusPkt = row[8];
+                        newDataMap.set(zawodnik, row);
+                    });
 
-                        // Sprawdź, czy zawodnik już istnieje
-                        let existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-                        if (existingPlayerRow) {
-                            // Aktualizacja istniejącego wiersza
-                            const rowElements = existingPlayerRow.querySelectorAll('td');
-                            let isChanged = false;
+                    const wynikIndex = 4; // Indeks kolumny 'Wynik'
 
-                            // Aktualizacja zmiany
-                            const zmianaElement = rowElements[0].querySelector('.zmiana');
-                            if (zmianaElement && parseInt(zmianaElement.textContent.trim()) !== parseInt(zmiana)) {
-                                zmianaElement.textContent = zmiana;
-                                isChanged = true;
-                            }
+                    // Aktualizacja istniejących wierszy
+                    newDataMap.forEach((newPlayerData, zawodnik) => {
+                        const existingEntry = currentData.get(zawodnik);
+                        const zawodnikIndex = getZawodnikIndex(zawodnik);
 
-                            // Aktualizacja obst
-                            if (parseInt(rowElements[2].textContent) !== parseInt(obst)) {
-                                rowElements[2].textContent = obst;
-                                isChanged = true;
-                            }
+                        if (zawodnikIndex === -1) {
+                            console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
+                            return;
+                        }
 
-                            // Aktualizacja zdob
-                            if (parseInt(rowElements[3].textContent) !== parseInt(zdob)) {
-                                rowElements[3].textContent = zdob;
-                                isChanged = true;
-                            }
+                        // Pobieranie nowych danych meczowych
+                        const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
 
-                            // Aktualizacja roznica
-                            if (parseInt(rowElements[4].textContent) !== parseInt(roznica)) {
-                                rowElements[4].textContent = roznica;
-                                isChanged = true;
-                            }
+                        let hasPlayerDataChanged = false;
+                        let hasMatchDataChanged = false;
 
-                            // Aktualizacja pkt
-                            const pktElement = rowElements[6].querySelector('.pkt');
-                            if (pktElement && parseInt(pktElement.textContent) !== parseInt(pkt)) {
-                                pktElement.textContent = pkt;
-                                isChanged = true;
-                            }
+                        if (existingEntry) {
+                            // Porównanie danych zawodnika
+                            hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
 
-                            // Aktualizacja plus-pkt
-                            const plusPktElement = rowElements[6].querySelector('.plus-pkt');
-                            if (plusPktElement && parseInt(plusPktElement.textContent) !== parseInt(plusPkt)) {
-                                plusPktElement.textContent = plusPkt;
-                                isChanged = true;
-                            }
-
-                            if (isChanged) {
-                                highlightRow(existingPlayerRow);
-                            }
-
-                            // Aktualizacja formy
-                            const dotsContainer = rowElements[5].querySelector('.dots-container');
-                            const formaArray = forma.split(',');
-                            const row1 = formaArray.slice(0, 9).map(val => getSymbol(val)).join('');
-                            const row2 = formaArray.slice(9, 18).map(val => getSymbol(val)).join('');
-                            dotsContainer.innerHTML = `
-                                <div class="dots-row">${row1}</div>
-                                <div class="dots-row">${row2}</div>
-                            `;
+                            // Porównanie danych meczowych
+                            hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
                         } else {
-                            // Tworzenie nowego wiersza zawodnika
-                            const player = row;
-                            const {playerRow, detailsRow} = createPlayerRow(player);
+                            // Nowy zawodnik
+                            hasPlayerDataChanged = true;
+                            hasMatchDataChanged = true;
+                        }
+
+                        if (hasPlayerDataChanged || hasMatchDataChanged) {
+                            // Znaleziono zmianę, aktualizuj wiersz
+                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+
+                            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+
+                            if (existingPlayerRow && existingDetailsRow) {
+                                tableBody.replaceChild(playerRow, existingPlayerRow);
+                                tableBody.replaceChild(detailsRow, existingDetailsRow);
+
+                                // Jeśli wiersz był rozwinięty, utrzymaj rozwinięcie
+                                if (expandedRows.has(zawodnik)) {
+                                    detailsRow.classList.add('expanded');
+                                    const matches = detailsRow.querySelectorAll('.match');
+                                    matches.forEach((match, index) => {
+                                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
+                                    });
+                                }
+
+                                // Dodanie klasy podświetlającej, jeśli dane się zmieniły
+                                if (hasPlayerDataChanged) {
+                                    playerRow.classList.add('highlight');
+                                    setTimeout(() => {
+                                        playerRow.classList.remove('highlight');
+                                    }, 2000); // Podświetlenie na 2 sekundy
+                                }
+
+                                if (hasMatchDataChanged) {
+                                    // Znaleziono zmiany w wynikach meczów
+                                    const matches = detailsRow.querySelectorAll('.match');
+                                    matches.forEach(match => {
+                                        if (match.classList.contains('correct')) {
+                                            match.classList.add('highlight');
+                                            setTimeout(() => {
+                                                match.classList.remove('highlight');
+                                            }, 2000); // Podświetlenie na 2 sekundy
+                                        }
+                                    });
+                                }
+                            } else {
+                                // Jeśli zawodnik nie istnieje, dodaj wiersz
+                                tableBody.appendChild(playerRow);
+                                tableBody.appendChild(detailsRow);
+                            }
+
+                            // Aktualizacja mapy bieżących danych
+                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+                        }
+                    });
+
+                    // Usuwanie zawodników, którzy już nie istnieją
+                    currentData.forEach((_, zawodnik) => {
+                        if (!newDataMap.has(zawodnik)) {
+                            const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                            const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                            if (playerRow && detailsRow) {
+                                tableBody.removeChild(playerRow);
+                                tableBody.removeChild(detailsRow);
+                            }
+                            currentData.delete(zawodnik);
+                        }
+                    });
+
+                    // Sortowanie wierszy według rankingów
+                    const sortedPlayers = Array.from(newDataMap.values()).sort((a, b) => a[0] - b[0]); // Zakładam, że a[0] to ranking
+
+                    sortedPlayers.forEach((player, index) => {
+                        const zawodnik = player[2];
+                        const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                        const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+
+                        if (playerRow && detailsRow) {
                             tableBody.appendChild(playerRow);
                             tableBody.appendChild(detailsRow);
                         }
                     });
+
                 } catch (error) {
-                    console.error('Błąd podczas pobierania danych:', error);
-                    // Możesz dodać tutaj obsługę błędu, np. wyświetlenie komunikatu użytkownikowi
+                    console.error('Błąd podczas przetwarzania danych:', error);
                 } finally {
                     if (isInitialLoad) {
                         document.getElementById('loading-spinner').style.display = 'none';
@@ -314,10 +571,43 @@
                 }
             }
 
-            window.onload = () => fetchData(true);
-            setInterval(() => fetchData(false), 30000);
+            /**
+             * Funkcja do pobierania indeksu zawodnika w danych Wyniki
+             * @param {string} zawodnik - Nazwa zawodnika.
+             * @returns {number} - Indeks kolumny w danych Wyniki dla danego zawodnika.
+             */
+            function getZawodnikIndex(zawodnik) {
+                const mapping = {
+                    'Mariusz': 0,
+                    'Łukasz': 1,
+                    'Mateusz': 2,
+                    'Patryk': 3
+                    // Dodaj inne nazwiska i ich indeksy w razie potrzeby
+                };
+                return mapping[zawodnik] !== undefined ? mapping[zawodnik] : -1;
+            }
 
-           
+            /**
+             * Funkcja delegująca zdarzenia dla kliknięć w wiersze zawodników
+             */
+            document.getElementById('table-body').addEventListener('click', function(event) {
+                let target = event.target;
+
+                // Znajdź najbliższego rodzica tr z klasą 'player-row'
+                while (target && target !== this && !target.classList.contains('player-row')) {
+                    target = target.parentElement;
+                }
+
+                if (target && target.classList.contains('player-row')) {
+                    const zawodnik = target.getAttribute('data-zawodnik');
+                    const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                    if (detailsRow) {
+                        toggleDetails(zawodnik, detailsRow);
+                    }
+                }
+            });
+
+
             const menuIcon = document.getElementById('menu-icon');
     const menuContent = document.getElementById('menu-content');
     const menuOverlay = document.getElementById('menu-overlay');
@@ -344,20 +634,69 @@
         }
     });
 
-    // Przejście na inną stronę z animacją
-    links.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.body.classList.add('fade-out');
-            setTimeout(() => {
-                window.location.href = link.getAttribute('href');
-            }, 500);
-        });
-    });
 
-
-
+            /**
+             * Funkcja inicjująca ładowanie danych
+             */
+            window.onload = () => loadAndDisplayData(true);
+            setInterval(() => loadAndDisplayData(false), 60000);
         </script>
     </div>
+
+
+    <!-- Modal window -->
+            <div id="match-modal" class="match-modal">
+                <div class="modal-content" id="modal-content">
+                    <span class="close-button" id="close-modal">&times;</span>
+                    <div class="main-match-result">
+                        <img src="" alt="Left Team Logo" class="team-logo-large" id="left-team-logo-large">
+                        <span id="match-result-large"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-large" id="right-team-logo-large">
+                    </div>
+                    <div class="additional-matches">
+                        <div class="row">
+                            <div class="small-match" id="small-match-1">
+                                <div class="player-info">
+                                    <img src="" alt="Player 1 Avatar" class="player-avatar" id="player-avatar-1">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-1">
+                                <span id="small-match-result-1"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-1">
+                            </div>
+                            <div class="small-match" id="small-match-2">
+                                <div class="player-info">
+                                    <img src="" alt="Player 2 Avatar" class="player-avatar" id="player-avatar-2">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-2">
+                                <span id="small-match-result-2"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-2">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="small-match" id="small-match-3">
+                                <div class="player-info">
+                                    <img src="" alt="Player 3 Avatar" class="player-avatar" id="player-avatar-3">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-3">
+                                <span id="small-match-result-3"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-3">
+                            </div>
+                            <div class="small-match" id="small-match-4">
+                                <div class="player-info">
+                                    <img src="" alt="Player 4 Avatar" class="player-avatar" id="player-avatar-4">
+                                </div>
+                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-4">
+                                <span id="small-match-result-4"></span>
+                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-4">
+                            </div>
+                        </div>
+                        
+                    </div>
+                   
+                </div>
+            </div>
+
+
+        
 </body>
 </html>
