@@ -57,7 +57,7 @@ table.leaderboard {
     border-radius: 10px;
     overflow: hidden;
     table-layout: fixed;
-    opacity: 0;
+    opacity: 1;
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
@@ -76,7 +76,8 @@ table.leaderboard th, table.leaderboard td {
     padding: 6px;
     text-align: center;
     color: white;
-    font-size: 0.85em;
+    
+    
 }
 
 table.leaderboard td {
@@ -106,6 +107,7 @@ table.leaderboard th:nth-child(4), table.leaderboard td:nth-child(4) {
 
 table.leaderboard th:nth-child(5), table.leaderboard td:nth-child(5) {
     width: 10%;
+    
 }
 
 table.leaderboard th:nth-child(6), table.leaderboard td:nth-child(6) {
@@ -124,12 +126,13 @@ table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
 }
 
 .avatar img {
-    width: 30px; /* Ustaw odpowiednią szerokość */
+    width: 40px; /* Ustaw odpowiednią szerokość */
 }
 
 .avatar span {
     /* Umożliwia, aby imię było wyśrodkowane w pionie */
     line-height: normal; /* Ustal linię wysokości równą wysokości avatara */
+    font-size: 1.2em;
 }
 
 /* Styl dla zmienionego wiersza */
@@ -198,13 +201,13 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 }
 
 .points .pkt {
-    font-size: 1.2em; /* Większy rozmiar czcionki dla punktów */
+    font-size: 1.3em; /* Większy rozmiar czcionki dla punktów */
     color: white;
     line-height: 1; /* Zmniejszamy odstępy między liniami */
 }
 
 .points .plus-pkt {
-    font-size: 0.75em; /* Mniejszy rozmiar czcionki dla dodatkowych punktów */
+    font-size: 0.9em; /* Mniejszy rozmiar czcionki dla dodatkowych punktów */
     color: #21e821; /* Zielona czcionka */
     margin-top: 2px; /* Zmniejszenie odstępu między punktami */
     text-align: center;
@@ -212,7 +215,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 }
 
 .bramki {
-    font-size: 0.9em;
+    font-size: 1.2em;
     color: #fff;
     display: inline-block;
     vertical-align: middle;
@@ -223,8 +226,12 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     font-size: 0.9em;
     color: #fff;
     display: inline-block;
-    vertical-align: middle;
-    margin-right: 1px;
+}
+
+.ranking {
+    font-size: 1.3em;
+    color: #fff;
+    display: inline-block;
 }
 
 /* Kontener na kropki z formą zawodników */
@@ -286,19 +293,20 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     box-sizing: border-box;
     opacity: 0;
     transform: translateY(10px);
+    font-size: 1.2em;
 }
 
 .match.fade-in-match {
     opacity: 1;
     transform: translateY(0);
+    animation: fadeInMatch 1s ease forwards, blink-border 1s infinite; /* Zastosowanie obu animacji */
 }
 
 /* Styl dla logo drużyn */
 .team-logo {
-    width: 20px;
     height: 20px;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: 0%;
 }
 
 /* Styl dla wyniku meczu */
@@ -314,10 +322,6 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
         justify-content: center;
     }
 
-    .team-logo {
-        width: 15px;
-        height: 15px;
-    }
 
     .result {
         font-size: 0.8em;
@@ -449,7 +453,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 40%;
+    width: 50%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Czarne tło z przezroczystością 50% */
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
@@ -513,7 +517,57 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     overflow: hidden;
 }
 
+/* Styl dla podświetlenia zmienionych wierszy */
+.highlight {
+    background-color: #ffff99; /* Jasnożółty kolor */
+    transition: background-color 0.5s ease;
+}
 
+/* Styl dla podświetlenia poprawnych wyników meczów */
+.match.green {
+    background-color:#057c05; /* Jasnozielony kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia trafionych kategorii */
+.match.yellow {
+    background-color: #a79907; /* Jasnożółty kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia nietrafionych wyników */
+.match.red {
+    background-color: #a10808; /* Jasnoczerwony kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla animacji fade-in dla wierszy szczegółów */
+.details-row.expanded {
+    display: table-row;
+}
+
+.details-row {
+    display: none;
+}
+
+/* Animacja dla meczów */
+@keyframes fadeInMatch {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Opcjonalnie: Klasy dla kolorowania czcionki */
+.text-green {
+    color: #2e7d32; /* Zielony */
+}
+
+.text-yellow {
+    color: #f9a825; /* Żółty */
+}
+
+.text-red {
+    color: #c62828; /* Czerwony */
+}
 
 
 @keyframes fadeOut {
@@ -541,3 +595,174 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 .fade-in {
     animation: fadeIn 0.5s forwards;
 }
+
+
+/* Modal styles */
+.match-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Zwiększona przezroczystość */
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #0d0f20, #061c54);
+    padding: 20px;
+    border-radius: 12px; /* Zaokrąglone rogi */
+    max-width: 700px; /* Większe okienko */
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s ease;
+    text-align: center;
+    position: relative;
+    font-size: 20px; /* Rozmiar czcionki */
+    color: white;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    color: #fff; /* Biały kolor przycisku zamknięcia */
+    cursor: pointer;
+}
+
+.main-match-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.team-logo-large {
+    width: 80px; /* Zmniejszenie logo drużyn */
+    height: 80px;
+}
+
+#match-result-large {
+    font-size: 3em; /* Powiększony wynik meczu */
+    font-weight: bold;
+}
+
+.additional-matches .row {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    gap: 15px; /* Odstępy między rzędami */
+}
+
+/* Zaktualizowane stylowanie dla avatarów bez imion */
+.player-avatar {
+    width: 20%;
+    object-fit: cover;
+}
+
+/* Styl dla mniejszych wyników */
+.small-match {
+    background-color: #1a1a3d;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Utrzymanie dystansu między elementami */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.small-match img {
+    width: 30px;
+    height: 30px;
+}
+
+.small-match-result {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Kolorowanie tła na podstawie wyniku */
+.small-match.green {
+    background-color: #28a745;
+}
+
+.small-match.red {
+    background-color: #dc3545;
+}
+
+.small-match.yellow {
+    background-color: #ffc107;
+}
+
+.small-match.default {
+    background-color: #002766;
+}
+
+.team-logo-small {
+    width: 35px;
+    height: 35px;
+}
+
+/* Migające zielone obramowanie */
+.blink-green {
+    animation: blink-border-green 1s infinite;
+    border: 4px solid rgba(0, 255, 0, 0.6); /* Początkowe zielone obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-green {
+    0% {
+        border-color: rgba(0, 255, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(0, 255, 0, 0);
+    }
+    100% {
+        border-color: rgba(0, 255, 0, 0.6);
+    }
+}
+
+/* Migające żółte obramowanie */
+.blink-yellow {
+    animation: blink-border-yellow 1s infinite;
+    border: 4px solid rgba(255, 255, 0, 0.6); /* Początkowe żółte obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-yellow {
+    0% {
+        border-color: rgba(255, 255, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(255, 255, 0, 0);
+    }
+    100% {
+        border-color: rgba(255, 255, 0, 0.6);
+    }
+}
+
+/* Migające czerwone obramowanie */
+.blink-red {
+    animation: blink-border-red 1s infinite;
+    border: 4px solid rgba(255, 0, 0, 0.6); /* Początkowe czerwone obramowanie z 30% przezroczystością */
+}
+
+@keyframes blink-border-red {
+    0% {
+        border-color: rgba(255, 0, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(255, 0, 0, 0);
+    }
+    100% {
+        border-color: rgba(255, 0, 0, 0.6);
+    }
+}
+
