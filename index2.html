@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -79,6 +79,9 @@
                     if (!data.WWW || !data.Wyniki) {
                         throw new Error('Dane z arkusza są niekompletne lub niepoprawne.');
                     }
+
+                    // **Dodaj poniższą linię, aby zapisać dane do localStorage**
+                    localStorage.setItem('betligaData', JSON.stringify(data));
 
                     return data;  // Zwracamy obiekt z danymi z obu arkuszy
                 } catch (error) {
@@ -382,7 +385,16 @@ function closeMatchModal() {
              */
              function toggleDetails(zawodnik, detailsRow) {
     const isExpanded = expandedRows.has(zawodnik);
+    const matches = detailsRow.querySelectorAll('.match'); // Znajdź wszystkie mecze w kontenerze
+
     if (isExpanded) {
+        // Kontener jest rozwinięty, więc zamykamy go
+        matches.forEach((match) => {
+            match.style.opacity = '0';  // Ustaw opacity na 0, aby przygotować do animacji przy ponownym otwarciu
+            match.style.transform = 'translateY(10px)';  // Reset transform do początkowej wartości
+            match.style.animation = 'none'; // Usuń aktualną animację
+        });
+        
         detailsRow.classList.remove('expanded');
         expandedRows.delete(zawodnik);
     } else {
@@ -390,10 +402,9 @@ function closeMatchModal() {
         expandedRows.add(zawodnik);
 
         // Trigger a reflow to ensure the animation starts after expansion
-        const matches = detailsRow.querySelectorAll('.match');
         matches.forEach((match, index) => {
-            match.style.animation = 'none'; // Reset the animation
-            match.offsetHeight; // Force reflow
+            match.style.animation = 'none'; // Reset the animation to force reflow
+            match.offsetHeight; // Force reflow to apply the changes
 
             // Pobieranie aktualnej klasy animacji (może być 'blink-red', 'blink-green', 'blink-yellow')
             const backgroundStyle = match.classList.contains('blink-red') 
@@ -404,11 +415,14 @@ function closeMatchModal() {
                                     ? 'blink-border-yellow' 
                                     : '';
 
-            // Przypisanie odpowiedniej animacji
+            // Przypisanie odpowiedniej animacji z lekkim opóźnieniem, aby animacja była płynna
             match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s, ${backgroundStyle} 1s infinite`; 
         });
     }
 }
+
+
+
 
 
             /**
@@ -430,151 +444,144 @@ function closeMatchModal() {
              * Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
              * @param {boolean} isInitialLoad - Czy to pierwsze ładowanie danych.
              */
-            async function loadAndDisplayData(isInitialLoad = false) {
-                if (isInitialLoad) {
-                    document.getElementById('loading-spinner').style.display = 'flex';
-                }
 
-                const data = await fetchData();  // Pobranie danych z obu arkuszy: WWW i Wyniki
 
-                if (!data) {
-                    console.error('Brak danych do wyświetlenia.');
-                    return;
-                }
 
-                try {
-                    const playersData = data.WWW;
-                    const resultsData = data.Wyniki;
-                    const tableBody = document.getElementById('table-body');
 
-                    if (isInitialLoad) {
-                        tableBody.innerHTML = ''; // Wyczyść tabelę przy pierwszym ładowaniu
-                        document.querySelector('table.leaderboard').classList.add('fade-in');
-                    }
+             async function loadAndDisplayData(isInitialLoad = false) {
+    const data = await fetchData();  // Pobranie danych z API
 
-                    // Tworzenie mapy nowych danych dla łatwego dostępu
-                    const newDataMap = new Map();
-                    playersData.slice(1).forEach((row) => { // Pomijamy nagłówek
-                        const zawodnik = row[2];
-                        newDataMap.set(zawodnik, row);
-                    });
+    if (!data) {
+        console.error('Brak danych do wyświetlenia.');
+        return;
+    }
 
-                    const wynikIndex = 4; // Indeks kolumny 'Wynik'
+    try {
+        const playersData = data.WWW;  // Dane zawodników
+        const resultsData = data.Wyniki;  // Dane wyników
+        const tableBody = document.getElementById('table-body');
 
-                    // Aktualizacja istniejących wierszy
-                    newDataMap.forEach((newPlayerData, zawodnik) => {
-                        const existingEntry = currentData.get(zawodnik);
-                        const zawodnikIndex = getZawodnikIndex(zawodnik);
+        const newDataMap = new Map();  // Tworzymy mapę nowych danych
+        playersData.slice(1).forEach((row) => {  // Pomijamy nagłówek
+            const zawodnik = row[2];  // Nazwa zawodnika
+            newDataMap.set(zawodnik, row);  // Mapujemy dane
+        });
 
-                        if (zawodnikIndex === -1) {
-                            console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
-                            return;
-                        }
+        const wynikIndex = 4;  // Indeks kolumny 'Wynik'
 
-                        // Pobieranie nowych danych meczowych
-                        const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+        newDataMap.forEach((newPlayerData, zawodnik) => {
+            const existingEntry = currentData.get(zawodnik);  // Sprawdzamy, czy zawodnik już istnieje w currentData
+            const zawodnikIndex = getZawodnikIndex(zawodnik);
 
-                        let hasPlayerDataChanged = false;
-                        let hasMatchDataChanged = false;
-
-                        if (existingEntry) {
-                            // Porównanie danych zawodnika
-                            hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
-
-                            // Porównanie danych meczowych
-                            hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
-                        } else {
-                            // Nowy zawodnik
-                            hasPlayerDataChanged = true;
-                            hasMatchDataChanged = true;
-                        }
-
-                        if (hasPlayerDataChanged || hasMatchDataChanged) {
-                            // Znaleziono zmianę, aktualizuj wiersz
-                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
-
-                            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-                            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
-
-                            if (existingPlayerRow && existingDetailsRow) {
-                                tableBody.replaceChild(playerRow, existingPlayerRow);
-                                tableBody.replaceChild(detailsRow, existingDetailsRow);
-
-                                // Jeśli wiersz był rozwinięty, utrzymaj rozwinięcie
-                                if (expandedRows.has(zawodnik)) {
-                                    detailsRow.classList.add('expanded');
-                                    const matches = detailsRow.querySelectorAll('.match');
-                                    matches.forEach((match, index) => {
-                                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s`;
-                                    });
-                                }
-
-                                // Dodanie klasy podświetlającej, jeśli dane się zmieniły
-                                if (hasPlayerDataChanged) {
-                                    playerRow.classList.add('highlight');
-                                    setTimeout(() => {
-                                        playerRow.classList.remove('highlight');
-                                    }, 2000); // Podświetlenie na 2 sekundy
-                                }
-
-                                if (hasMatchDataChanged) {
-                                    // Znaleziono zmiany w wynikach meczów
-                                    const matches = detailsRow.querySelectorAll('.match');
-                                    matches.forEach(match => {
-                                        if (match.classList.contains('correct')) {
-                                            match.classList.add('highlight');
-                                            setTimeout(() => {
-                                                match.classList.remove('highlight');
-                                            }, 2000); // Podświetlenie na 2 sekundy
-                                        }
-                                    });
-                                }
-                            } else {
-                                // Jeśli zawodnik nie istnieje, dodaj wiersz
-                                tableBody.appendChild(playerRow);
-                                tableBody.appendChild(detailsRow);
-                            }
-
-                            // Aktualizacja mapy bieżących danych
-                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
-                        }
-                    });
-
-                    // Usuwanie zawodników, którzy już nie istnieją
-                    currentData.forEach((_, zawodnik) => {
-                        if (!newDataMap.has(zawodnik)) {
-                            const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-                            const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
-                            if (playerRow && detailsRow) {
-                                tableBody.removeChild(playerRow);
-                                tableBody.removeChild(detailsRow);
-                            }
-                            currentData.delete(zawodnik);
-                        }
-                    });
-
-                    // Sortowanie wierszy według rankingów
-                    const sortedPlayers = Array.from(newDataMap.values()).sort((a, b) => a[0] - b[0]); // Zakładam, że a[0] to ranking
-
-                    sortedPlayers.forEach((player, index) => {
-                        const zawodnik = player[2];
-                        const playerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-                        const detailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
-
-                        if (playerRow && detailsRow) {
-                            tableBody.appendChild(playerRow);
-                            tableBody.appendChild(detailsRow);
-                        }
-                    });
-
-                } catch (error) {
-                    console.error('Błąd podczas przetwarzania danych:', error);
-                } finally {
-                    if (isInitialLoad) {
-                        document.getElementById('loading-spinner').style.display = 'none';
-                    }
-                }
+            if (zawodnikIndex === -1) {
+                console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
+                return;
             }
+
+            const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+
+            let hasPlayerDataChanged = false;
+            let hasMatchDataChanged = false;
+
+            // Porównujemy stare dane z nowymi, aby wykryć zmiany
+            if (existingEntry) {
+                hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
+                hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
+            } else {
+                hasPlayerDataChanged = true;
+                hasMatchDataChanged = true;
+            }
+
+            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+
+            // Sprawdzenie pozycji zawodnika (czy uległa zmianie)
+            const currentRanking = existingPlayerRow ? parseInt(existingPlayerRow.querySelector('td').innerText, 10) : -1;
+            const newRanking = parseInt(newPlayerData[0], 10);  // Odczytujemy ranking z nowych danych
+            const positionChanged = currentRanking !== newRanking;
+
+            // Sprawdzamy, czy kontener z wynikami jest otwarty
+            const wasExpanded = expandedRows.has(zawodnik);
+
+            // Jeśli dane zawodnika lub jego mecze się zmieniły
+            if (hasPlayerDataChanged || hasMatchDataChanged) {
+                const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+
+                // Aktualizujemy wiersze, które już istnieją
+                if (existingPlayerRow && existingDetailsRow) {
+                    existingPlayerRow.innerHTML = playerRow.innerHTML;  // Aktualizacja zawartości wiersza
+                    existingDetailsRow.innerHTML = detailsRow.innerHTML;  // Aktualizacja zawartości szczegółów
+
+                    // **Jeżeli kontener był otwarty, renderujemy nową zawartość z nowych danych**
+                    if (wasExpanded && !positionChanged) {
+                        const newMatchHTML = generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex);
+                        existingDetailsRow.querySelector('.matches-row').innerHTML = newMatchHTML;  // Zaktualizuj zawartość
+
+                        // **Dodajemy klasę `fade-in-match` po renderowaniu nowych danych** 
+                        const matches = existingDetailsRow.querySelectorAll('.match');
+                        matches.forEach((match, index) => {
+                            setTimeout(() => {
+                                match.classList.add('fade-in-match');
+                            }, index * 100); // Dodajemy małe opóźnienie dla każdej animacji
+                        });
+
+                        existingDetailsRow.classList.add('expanded');  // Utrzymanie otwartego kontenera
+                        expandedRows.add(zawodnik);  // Dodajemy ponownie zawodnika do zestawu rozwiniętych kontenerów
+                    }
+                }
+
+                // Sprawdź, czy pozycja zawodnika się zmieniła
+                if (positionChanged) {
+                    // Zamknij kontener wyników, jeśli zawodnik zmienił pozycję
+                    expandedRows.delete(zawodnik);  // Usuwamy zawodnika z listy rozwiniętych kontenerów
+                    existingDetailsRow.classList.remove('expanded');
+                }
+
+                // Przesuń istniejący wiersz na odpowiednią pozycję w tabeli
+                const targetPosition = Array.from(tableBody.children).findIndex(
+                    row => parseInt(row.querySelector('td').innerText, 10) > newRanking
+                );
+
+                if (targetPosition !== -1) {
+                    // Przenieś wiersze w odpowiednie miejsce
+                    tableBody.insertBefore(existingPlayerRow, tableBody.children[targetPosition]);
+                    tableBody.insertBefore(existingDetailsRow, tableBody.children[targetPosition + 1]);
+                } else {
+                    // Jeśli zawodnik ma być na końcu tabeli
+                    tableBody.appendChild(existingPlayerRow);
+                    tableBody.appendChild(existingDetailsRow);
+                }
+
+                // Dodaj klasę podświetlenia dla wizualnego wskazania zmiany
+                existingPlayerRow.classList.add('highlight');
+
+                // Usunięcie klasy podświetlenia po 5 sekundach
+                setTimeout(() => {
+                    existingPlayerRow.classList.remove('highlight');
+                }, 5000);
+
+                // Aktualizacja currentData
+                currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+            }
+        });
+
+    } catch (error) {
+        console.error('Błąd podczas przetwarzania danych:', error);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             /**
              * Funkcja do pobierania indeksu zawodnika w danych Wyniki
@@ -643,8 +650,52 @@ function closeMatchModal() {
             /**
              * Funkcja inicjująca ładowanie danych
              */
-            window.onload = () => loadAndDisplayData(true);
-            setInterval(() => loadAndDisplayData(false), 60000);
+            /**
+ * Funkcja inicjująca ładowanie danych
+ */
+ window.onload = () => {
+    // **Dodaj poniższy blok, aby załadować dane z localStorage jeśli istnieją**
+    const storedData = localStorage.getItem('betligaData');
+    if (storedData) {
+        const data = JSON.parse(storedData);
+        try {
+            const playersData = data.WWW;
+            const resultsData = data.Wyniki;
+            const tableBody = document.getElementById('table-body');
+
+            tableBody.innerHTML = ''; // Wyczyść tabelę przy ładowaniu z localStorage
+            document.querySelector('table.leaderboard').classList.add('fade-in');
+
+            // Tworzenie mapy nowych danych dla łatwego dostępu
+            const newDataMap = new Map();
+            playersData.slice(1).forEach((row) => { // Pomijamy nagłówek
+                const zawodnik = row[2];
+                newDataMap.set(zawodnik, row);
+            });
+
+            const wynikIndex = 4; // Indeks kolumny 'Wynik'
+
+            newDataMap.forEach((newPlayerData, zawodnik) => {
+    const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+    tableBody.appendChild(playerRow);
+    tableBody.appendChild(detailsRow);
+
+    // **Dodaj poniższą linię, aby zaktualizować currentData**
+    const zawodnikIndex = getZawodnikIndex(zawodnik);
+    const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+    currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+});
+
+        } catch (error) {
+            console.error('Błąd podczas przetwarzania danych z localStorage:', error);
+        }
+    }
+
+    // **Zachowaj istniejące wywołanie funkcji ładowania danych z parametrem false**
+    loadAndDisplayData(false);
+};
+
+            setInterval(() => loadAndDisplayData(false), 5000);
         </script>
     </div>
 
