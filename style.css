@@ -48,6 +48,7 @@ body {
 /* Tabela */
 .table-container {
     margin-top: 15px;
+    opacity: 0.9;
 }
 
 table.leaderboard {
@@ -59,7 +60,7 @@ table.leaderboard {
     table-layout: fixed;
     opacity: 1;
     transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 1s ease, transform 1s ease;
 }
 
 table.leaderboard.fade-in {
@@ -186,6 +187,8 @@ table.leaderboard tbody tr.details-row .details-placeholder {
     opacity: 0;
     transition: opacity 0.5s ease;
 }
+
+
 
 table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     opacity: 1;
@@ -363,7 +366,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 
 /* Animacja pojawiania się wierszy */
 .fade-in-row {
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 2s ease-in-out;
 }
 
 @keyframes fadeIn {
@@ -765,5 +768,4 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
         border-color: rgba(255, 0, 0, 0.6);
     }
 }
-
 
