@@ -431,126 +431,141 @@ function closeMatchModal() {
              * @param {boolean} isInitialLoad - Czy to pierwsze ładowanie danych.
              */
              async function loadAndDisplayData(isInitialLoad = false) {
-    const data = await fetchData();  // Pobranie danych z API
+                const spinner = document.getElementById('loading-spinner');
+                if (isInitialLoad) {
+                    spinner.classList.add('active'); // Pokaż spinner
+                }
 
-    if (!data) {
-        console.error('Brak danych do wyświetlenia.');
-        return;
-    }
+                const data = await fetchData();  // Pobranie danych z API
 
-    try {
-        const playersData = data.WWW;  // Dane zawodników
-        const resultsData = data.Wyniki;  // Dane wyników
-        const tableBody = document.getElementById('table-body');
+                if (isInitialLoad) {
+                    spinner.classList.remove('active'); // Ukryj spinner po zakończeniu ładowania
+                }
 
-        const newDataMap = new Map();  // Tworzymy mapę nowych danych
-        playersData.slice(1).forEach((row) => {  // Pomijamy nagłówek
-            const zawodnik = row[2];  // Nazwa zawodnika
-            newDataMap.set(zawodnik, row);  // Mapujemy dane
-        });
+                if (!data) {
+                    console.error('Brak danych do wyświetlenia.');
+                    return;
+                }
 
-        const wynikIndex = 4;  // Indeks kolumny 'Wynik'
+                try {
+                    const playersData = data.WWW;  // Dane zawodników
+                    const resultsData = data.Wyniki;  // Dane wyników
+                    const tableBody = document.getElementById('table-body');
 
-        newDataMap.forEach((newPlayerData, zawodnik) => {
-            const existingEntry = currentData.get(zawodnik);  // Sprawdzamy, czy zawodnik już istnieje w currentData
-            const zawodnikIndex = getZawodnikIndex(zawodnik);
+                    const newDataMap = new Map();  // Tworzymy mapę nowych danych
+                    playersData.slice(1).forEach((row) => {  // Pomijamy nagłówek
+                        const zawodnik = row[2];  // Nazwa zawodnika
+                        newDataMap.set(zawodnik, row);  // Mapujemy dane
+                    });
 
-            if (zawodnikIndex === -1) {
-                console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
-                return;
-            }
+                    const wynikIndex = 4;  // Indeks kolumny 'Wynik'
 
-            const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+                    newDataMap.forEach((newPlayerData, zawodnik) => {
+                        const existingEntry = currentData.get(zawodnik);  // Sprawdzamy, czy zawodnik już istnieje w currentData
+                        const zawodnikIndex = getZawodnikIndex(zawodnik);
 
-            let hasPlayerDataChanged = false;
-            let hasMatchDataChanged = false;
+                        if (zawodnikIndex === -1) {
+                            console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
+                            return;
+                        }
 
-            // Porównujemy stare dane z nowymi, aby wykryć zmiany
-            if (existingEntry) {
-                hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
-                hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
-            } else {
-                hasPlayerDataChanged = true;
-                hasMatchDataChanged = true;
-            }
+                        const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
 
-            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                        let hasPlayerDataChanged = false;
+                        let hasMatchDataChanged = false;
 
-            // Sprawdzenie pozycji zawodnika (czy uległa zmianie)
-            const currentRanking = existingPlayerRow ? parseInt(existingPlayerRow.querySelector('td').innerText, 10) : -1;
-            const newRanking = parseInt(newPlayerData[0], 10);  // Odczytujemy ranking z nowych danych
-            const positionChanged = currentRanking !== newRanking;
+                        // Porównujemy stare dane z nowymi, aby wykryć zmiany
+                        if (existingEntry) {
+                            hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
+                            hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
+                        } else {
+                            hasPlayerDataChanged = true;
+                            hasMatchDataChanged = true;
+                        }
 
-            // Sprawdzamy, czy kontener z wynikami jest otwarty
-            const wasExpanded = expandedRows.has(zawodnik);
+                        const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                        const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
 
-            // Jeśli dane zawodnika lub jego mecze się zmieniły
-            if (hasPlayerDataChanged || hasMatchDataChanged) {
-                const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+                        // Sprawdzenie pozycji zawodnika (czy uległa zmianie)
+                        const currentRanking = existingPlayerRow ? parseInt(existingPlayerRow.querySelector('td').innerText, 10) : -1;
+                        const newRanking = parseInt(newPlayerData[0], 10);  // Odczytujemy ranking z nowych danych
+                        const positionChanged = currentRanking !== newRanking;
 
-                // Aktualizujemy wiersze, które już istnieją
-                if (existingPlayerRow && existingDetailsRow) {
-                    existingPlayerRow.innerHTML = playerRow.innerHTML;  // Aktualizacja zawartości wiersza
-                    existingDetailsRow.innerHTML = detailsRow.innerHTML;  // Aktualizacja zawartości szczegółów
+                        // Sprawdzamy, czy kontener z wynikami jest otwarty
+                        const wasExpanded = expandedRows.has(zawodnik);
 
-                    // **Jeżeli kontener był otwarty, renderujemy nową zawartość z nowych danych**
-                    if (wasExpanded && !positionChanged) {
-                        const newMatchHTML = generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex);
-                        existingDetailsRow.querySelector('.matches-row').innerHTML = newMatchHTML;  // Zaktualizuj zawartość
+                        // Jeśli dane zawodnika lub jego mecze się zmieniły
+                        if (hasPlayerDataChanged || hasMatchDataChanged) {
+                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
 
-                        // **Dodajemy klasę `fade-in-match` po renderowaniu nowych danych** 
-                        const matches = existingDetailsRow.querySelectorAll('.match');
-                        matches.forEach((match, index) => {
+                            // Aktualizujemy wiersze, które już istnieją
+                            if (existingPlayerRow && existingDetailsRow) {
+                                existingPlayerRow.innerHTML = playerRow.innerHTML;  // Aktualizacja zawartości wiersza
+                                existingDetailsRow.innerHTML = detailsRow.innerHTML;  // Aktualizacja zawartości szczegółów
+
+                                // **Jeżeli kontener był otwarty, renderujemy nową zawartość z nowych danych**
+                                if (wasExpanded && !positionChanged) {
+                                    const newMatchHTML = generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex);
+                                    existingDetailsRow.querySelector('.matches-row').innerHTML = newMatchHTML;  // Zaktualizuj zawartość
+
+                                    // **Dodajemy klasę `fade-in-match` po renderowaniu nowych danych** 
+                                    const matches = existingDetailsRow.querySelectorAll('.match');
+                                    matches.forEach((match, index) => {
+                                        setTimeout(() => {
+                                            match.classList.add('fade-in-match');
+                                        }, index * 100); // Dodajemy małe opóźnienie dla każdej animacji
+                                    });
+
+                                    existingDetailsRow.classList.add('expanded');  // Utrzymanie otwartego kontenera
+                                    expandedRows.add(zawodnik);  // Dodajemy ponownie zawodnika do zestawu rozwiniętych kontenerów
+                                }
+                            } else {
+                                // Jeśli wiersz zawodnika nie istnieje, dodajemy nowy wiersz i szczegóły
+                                tableBody.appendChild(playerRow);
+                                tableBody.appendChild(detailsRow);
+                            }
+
+                            // Sprawdź, czy pozycja zawodnika się zmieniła
+                            if (positionChanged) {
+                                // Zamknij kontener wyników, jeśli zawodnik zmienił pozycję
+                                if (existingDetailsRow) {
+                                    existingDetailsRow.classList.remove('expanded');
+                                }
+                                expandedRows.delete(zawodnik);  // Usuwamy zawodnika z listy rozwiniętych kontenerów
+                            }
+
+                            // Przesuń istniejący wiersz na odpowiednią pozycję w tabeli
+                            const targetPosition = Array.from(tableBody.children).findIndex(
+                                row => parseInt(row.querySelector('td').innerText, 10) > newRanking
+                            );
+
+                            if (targetPosition !== -1) {
+                                // Przenieś wiersze w odpowiednie miejsce
+                                tableBody.insertBefore(existingPlayerRow || playerRow, tableBody.children[targetPosition]);
+                                tableBody.insertBefore(existingDetailsRow || detailsRow, tableBody.children[targetPosition + 1]);
+                            } else {
+                                // Jeśli zawodnik ma być na końcu tabeli
+                                tableBody.appendChild(existingPlayerRow || playerRow);
+                                tableBody.appendChild(existingDetailsRow || detailsRow);
+                            }
+
+                            // Dodaj klasę podświetlenia dla wizualnego wskazania zmiany
+                            (existingPlayerRow || playerRow).classList.add('highlight');
+
+                            // Usunięcie klasy podświetlenia po 5 sekundach
                             setTimeout(() => {
-                                match.classList.add('fade-in-match');
-                            }, index * 100); // Dodajemy małe opóźnienie dla każdej animacji
-                        });
+                                (existingPlayerRow || playerRow).classList.remove('highlight');
+                            }, 5000);
 
-                        existingDetailsRow.classList.add('expanded');  // Utrzymanie otwartego kontenera
-                        expandedRows.add(zawodnik);  // Dodajemy ponownie zawodnika do zestawu rozwiniętych kontenerów
-                    }
+                            // Aktualizacja currentData
+                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Błąd podczas przetwarzania danych:', error);
                 }
-
-                // Sprawdź, czy pozycja zawodnika się zmieniła
-                if (positionChanged) {
-                    // Zamknij kontener wyników, jeśli zawodnik zmienił pozycję
-                    expandedRows.delete(zawodnik);  // Usuwamy zawodnika z listy rozwiniętych kontenerów
-                    existingDetailsRow.classList.remove('expanded');
-                }
-
-                // Przesuń istniejący wiersz na odpowiednią pozycję w tabeli
-                const targetPosition = Array.from(tableBody.children).findIndex(
-                    row => parseInt(row.querySelector('td').innerText, 10) > newRanking
-                );
-
-                if (targetPosition !== -1) {
-                    // Przenieś wiersze w odpowiednie miejsce
-                    tableBody.insertBefore(existingPlayerRow, tableBody.children[targetPosition]);
-                    tableBody.insertBefore(existingDetailsRow, tableBody.children[targetPosition + 1]);
-                } else {
-                    // Jeśli zawodnik ma być na końcu tabeli
-                    tableBody.appendChild(existingPlayerRow);
-                    tableBody.appendChild(existingDetailsRow);
-                }
-
-                // Dodaj klasę podświetlenia dla wizualnego wskazania zmiany
-                existingPlayerRow.classList.add('highlight');
-
-                // Usunięcie klasy podświetlenia po 5 sekundach
-                setTimeout(() => {
-                    existingPlayerRow.classList.remove('highlight');
-                }, 5000);
-
-                // Aktualizacja currentData
-                currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
             }
-        });
-
-    } catch (error) {
-        console.error('Błąd podczas przetwarzania danych:', error);
-    }
-}
 
 
 
@@ -622,13 +637,17 @@ function closeMatchModal() {
              * Funkcja inicjująca ładowanie danych
              */
              window.onload = async () => {
+    const spinner = document.getElementById('loading-spinner');
     const storedData = localStorage.getItem('lmData');
 
     if (storedData) {
-        const data = JSON.parse(storedData);
+        // Jeśli dane są w localStorage, załaduj je
+        spinner.classList.add('active'); // Pokaż spinner podczas ładowania danych z localStorage
+
         try {
-            const playersData = data.WWW;
-            const resultsData = data.Wyniki;
+            const data = JSON.parse(storedData);
+            const playersData = data.WWW;  // Dane zawodników
+            const resultsData = data.Wyniki;  // Dane wyników
             const tableBody = document.getElementById('table-body');
 
             tableBody.innerHTML = ''; // Wyczyść tabelę
@@ -650,7 +669,10 @@ function closeMatchModal() {
                 const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
                 currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
             });
+
+            spinner.classList.remove('active'); // Ukryj spinner po załadowaniu danych
         } catch (error) {
+            spinner.classList.remove('active'); // Ukryj spinner nawet jeśli wystąpił błąd
             console.error('Błąd podczas przetwarzania danych z localStorage:', error);
         }
     } else {
@@ -661,6 +683,7 @@ function closeMatchModal() {
     // Ustaw interwał do odświeżania danych co 5 sekund
     setInterval(() => loadAndDisplayData(false), 5000);
 };
+
 
 
         </script>
