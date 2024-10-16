@@ -15,7 +15,7 @@
         </div>
         <nav class="menu-content" id="menu-content">
             <ul>
-                <li><a href="index2.html" class="menu-link">MŁMP Bet Liga</a></li>
+                <li><a href="Index2.html" class="menu-link">MŁMP Bet Liga</a></li>
             </ul>
         </nav>
     </div>
@@ -76,7 +76,7 @@
                 }
 
                 // **Dodaj poniższą linię, aby zapisać dane do localStorage**
-                localStorage.setItem('betligaData', JSON.stringify(data));
+                localStorage.setItem('lmData', JSON.stringify(data));
 
                 return data;  // Zwracamy obiekt z danymi z obu arkuszy
             } catch (error) {
@@ -622,7 +622,7 @@ function closeMatchModal() {
              * Funkcja inicjująca ładowanie danych
              */
              window.onload = async () => {
-    const storedData = localStorage.getItem('betligaData');
+    const storedData = localStorage.getItem('lmData');
 
     if (storedData) {
         const data = JSON.parse(storedData);
