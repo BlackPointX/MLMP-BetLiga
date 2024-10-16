@@ -364,6 +364,10 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     }
 }
 
+#loading-spinner.active {
+    display: block;
+}
+
 /* Animacja pojawiania się wierszy */
 .fade-in-row {
     animation: fadeIn 2s ease-in-out;
