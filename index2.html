@@ -55,11 +55,59 @@
             <div class="spinner"></div>
         </div>
 
+        <!-- Modal window -->
+        <div id="match-modal" class="match-modal">
+            <div class="modal-content" id="modal-content">
+                <span class="close-button" id="close-modal">&times;</span>
+                <div class="main-match-result">
+                    <img src="" alt="Left Team Logo" class="team-logo-large" id="left-team-logo-large">
+                    <span id="match-result-large"></span>
+                    <img src="" alt="Right Team Logo" class="team-logo-large" id="right-team-logo-large">
+                </div>
+                <div class="additional-matches">
+                    <div class="row">
+                        <div class="small-match" id="small-match-1">
+                            <div class="player-info">
+                                <img src="" alt="Player 1 Avatar" class="player-avatar" id="player-avatar-1">
+                            </div>
+                            <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-1">
+                            <span id="small-match-result-1"></span>
+                            <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-1">
+                        </div>
+                        <div class="small-match" id="small-match-2">
+                            <div class="player-info">
+                                <img src="" alt="Player 2 Avatar" class="player-avatar" id="player-avatar-2">
+                            </div>
+                            <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-2">
+                            <span id="small-match-result-2"></span>
+                            <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-2">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-match" id="small-match-3">
+                            <div class="player-info">
+                                <img src="" alt="Player 3 Avatar" class="player-avatar" id="player-avatar-3">
+                            </div>
+                            <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-3">
+                            <span id="small-match-result-3"></span>
+                            <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-3">
+                        </div>
+                        <div class="small-match" id="small-match-4">
+                            <div class="player-info">
+                                <img src="" alt="Player 4 Avatar" class="player-avatar" id="player-avatar-4">
+                            </div>
+                            <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-4">
+                            <span id="small-match-result-4"></span>
+                            <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             let expandedRows = new Set();
             const currentData = new Map(); // Map to store current player and match data
-
-
 
             /**
              * Funkcja pobierająca dane z Google Sheets
@@ -80,7 +128,7 @@
                         throw new Error('Dane z arkusza są niekompletne lub niepoprawne.');
                     }
 
-                    // **Dodaj poniższą linię, aby zapisać dane do localStorage**
+                    // Zapisanie danych do localStorage
                     localStorage.setItem('betligaData', JSON.stringify(data));
 
                     return data;  // Zwracamy obiekt z danymi z obu arkuszy
@@ -136,140 +184,123 @@
                 };
             }
 
-          /**
- * Funkcja generująca wyniki meczów dla wybranego zawodnika
- * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
- * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
- * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
- * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
- */
- function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
-    let matchesHTML = '';
-    for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
-        const row = resultsData[i];
-        const playerResultWithStyle = row[zawodnikIndex];
-        const wynikResult = row[wynikIndex];
-        const parsedResult = parseResult(playerResultWithStyle); // Zachowujemy przetwarzanie wyników
+            /**
+             * Funkcja generująca wyniki meczów dla wybranego zawodnika
+             * @param {Array} resultsData - Dane wyników z arkusza 'Wyniki'.
+             * @param {number} zawodnikIndex - Indeks kolumny dla danego zawodnika w 'Wyniki'.
+             * @param {number} wynikIndex - Indeks kolumny 'Wynik' w danych wyników.
+             * @returns {string} - HTML z wynikami meczów z odpowiednimi klasami kolorów.
+             */
+            function generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex) {
+                let matchesHTML = '';
+                for (let i = 1; i < resultsData.length; i++) { // Pomijamy pierwszy wiersz nagłówka
+                    const row = resultsData[i];
+                    const playerResultWithStyle = row[zawodnikIndex];
+                    const wynikResult = row[wynikIndex];
+                    const parsedResult = parseResult(playerResultWithStyle); // Zachowujemy przetwarzanie wyników
 
-        // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
-        const leftTeamLogo = row[4];  // Logo lewej drużyny
-        const rightTeamLogo = row[5]; // Logo prawej drużyny
+                    // Pobieramy logo drużyn z kolumn 4 i 5 (logo lewej drużyny i prawej drużyny)
+                    const leftTeamLogo = row[4];  // Logo lewej drużyny
+                    const rightTeamLogo = row[5]; // Logo prawej drużyny
 
-        // Dodajemy wynik w tabeli z odpowiednimi stylami
-        matchesHTML += `
-            <div class="match ${parsedResult.backgroundStyle}" 
-                 data-result="${parsedResult.displayResult}" 
-                 data-left-logo="${leftTeamLogo}" 
-                 data-right-logo="${rightTeamLogo}" 
-                 data-match-index="${i}">
-                <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
-                ${parsedResult.displayResult}
-                <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
-            </div>
-        `;
-    }
+                    // Dodajemy wynik w tabeli z odpowiednimi stylami
+                    matchesHTML += `
+                        <div class="match ${parsedResult.backgroundStyle}" 
+                             data-result="${parsedResult.displayResult}" 
+                             data-left-logo="${leftTeamLogo}" 
+                             data-right-logo="${rightTeamLogo}" 
+                             data-match-index="${i}">
+                            <img src="${leftTeamLogo}" alt="Team Logo" class="team-logo">
+                            ${parsedResult.displayResult}
+                            <img src="${rightTeamLogo}" alt="Team Logo" class="team-logo">
+                        </div>
+                    `;
+                }
 
-    // Obsługa kliknięcia na wyniki meczów
-    setTimeout(() => {
-        document.querySelectorAll('.match').forEach(match => {
-            match.addEventListener('click', function() {
-                const matchIndex = this.getAttribute('data-match-index'); // Pobierz indeks meczu
-                openMatchModal(this, resultsData, matchIndex); // Przekazujemy dane o meczu
-            });
-        });
-    }, 100);
+                // Obsługa kliknięcia na wyniki meczów
+                setTimeout(() => {
+                    document.querySelectorAll('.match').forEach(match => {
+                        match.addEventListener('click', function() {
+                            const matchIndex = this.getAttribute('data-match-index'); // Pobierz indeks meczu
+                            openMatchModal(this, resultsData, matchIndex); // Przekazujemy dane o meczu
+                        });
+                    });
+                }, 100);
 
-    return matchesHTML;
-}
+                return matchesHTML;
+            }
 
+            /**
+             * Funkcja otwierająca okienko z wynikami meczów
+             * @param {HTMLElement} matchElement - Element meczu, na który kliknięto.
+             */
+            function openMatchModal(matchElement, resultsData, matchIndex) {
+                const leftLogo = resultsData[matchIndex][4]; // Pobierz logo lewej drużyny
+                const rightLogo = resultsData[matchIndex][5]; // Pobierz logo prawej drużyny
+                const realMatchResult = resultsData[matchIndex][6]; // Pobierz rzeczywisty wynik
 
+                // Ustawiamy duży wynik i loga
+                document.getElementById('left-team-logo-large').src = leftLogo;
+                document.getElementById('right-team-logo-large').src = rightLogo;
+                document.getElementById('match-result-large').textContent = realMatchResult;
 
-/**
- * Funkcja otwierająca okienko z wynikami meczów
- * @param {HTMLElement} matchElement - Element meczu, na który kliknięto.
- */
- function openMatchModal(matchElement, resultsData, matchIndex) {
-    const leftLogo = resultsData[matchIndex][4]; // Pobierz logo lewej drużyny
-    const rightLogo = resultsData[matchIndex][5]; // Pobierz logo prawej drużyny
-    const realMatchResult = resultsData[matchIndex][6]; // Pobierz rzeczywisty wynik
+                const avatars = [
+                    'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png',
+                    'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png',
+                    'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png',
+                    'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png'
+                ];
 
-    // Ustawiamy duży wynik i loga
-    document.getElementById('left-team-logo-large').src = leftLogo;
-    document.getElementById('right-team-logo-large').src = rightLogo;
-    document.getElementById('match-result-large').textContent = realMatchResult;
+                // Pobierz wyniki 4 graczy dla tego meczu
+                const resultsForMatch = resultsData[matchIndex].slice(0, 4);
 
-    const avatars = [
-        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png',
-        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png',
-        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png',
-        'https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png'
-    ];
+                // Wyświetl mniejsze wyniki dla graczy
+                for (let i = 1; i <= 4; i++) {
+                    const parsedResult = parseResult(resultsForMatch[i - 1]); // Przetwarzamy wynik
 
-    // Pobierz wyniki 4 graczy dla tego meczu
-    const resultsForMatch = resultsData[matchIndex].slice(0, 4);
+                    // Ustaw wynik bez sufiksu
+                    document.getElementById(`small-match-result-${i}`).textContent = parsedResult.displayResult;
 
-    // Wyświetl mniejsze wyniki dla graczy
-    for (let i = 1; i <= 4; i++) {
-        const parsedResult = parseResult(resultsForMatch[i - 1]); // Przetwarzamy wynik
+                    // Kolorujemy box na podstawie sufiksu
+                    const smallMatchElement = document.getElementById(`small-match-${i}`);
+                    smallMatchElement.className = `small-match ${parsedResult.backgroundStyle}`; // Ustaw kolor
 
-        // Ustawiamy wynik bez sufiksu
-        document.getElementById(`small-match-result-${i}`).textContent = parsedResult.displayResult;
+                    // Ustaw avatary graczy
+                    document.getElementById(`player-avatar-${i}`).src = avatars[i - 1];
 
-        // Kolorujemy box na podstawie sufiksu
-        const smallMatchElement = document.getElementById(`small-match-${i}`);
-        smallMatchElement.className = `small-match ${parsedResult.backgroundStyle}`; // Ustaw kolor
+                    // Ustaw loga drużyn
+                    document.getElementById(`small-left-logo-${i}`).src = leftLogo;
+                    document.getElementById(`small-right-logo-${i}`).src = rightLogo;
+                }
 
-        // Ustaw avatary graczy
-        document.getElementById(`player-avatar-${i}`).src = avatars[i - 1];
+                // Wyświetlamy modalne okno
+                const modal = document.getElementById('match-modal');
+                modal.style.display = 'flex';
 
-        // Ustaw loga drużyn
-        document.getElementById(`small-left-logo-${i}`).src = leftLogo;
-        document.getElementById(`small-right-logo-${i}`).src = rightLogo;
-    }
+                // Obsługa zamykania modalnego okna po kliknięciu
+                modal.addEventListener('click', closeMatchModal);
+            }
 
-    // Wyświetlamy modalne okno
-    const modal = document.getElementById('match-modal');
-    modal.style.display = 'flex';
+            /**
+             * Funkcja do usuwania sufiksu z wyniku (np. "3:1/g" -> "3:1")
+             * @param {string} result - Wynik z sufiksem.
+             * @returns {string} - Wynik bez sufiksu.
+             */
+            function removeSuffix(result) {
+                const separatorIndex = result.lastIndexOf('/');
+                if (separatorIndex === -1) {
+                    return result; // Jeśli nie ma sufiksu, zwracamy oryginalny wynik
+                }
+                return result.substring(0, separatorIndex); // Usuwamy część po "/"
+            }
 
-    // Obsługa zamykania modalnego okna po kliknięciu
-    modal.addEventListener('click', closeMatchModal);
-}
-
-
-
-
-/**
- * Funkcja do usuwania sufiksu z wyniku (np. "3:1/g" -> "3:1")
- * @param {string} result - Wynik z sufiksem.
- * @returns {string} - Wynik bez sufiksu.
- */
-function removeSuffix(result) {
-    const separatorIndex = result.lastIndexOf('/');
-    if (separatorIndex === -1) {
-        return result; // Jeśli nie ma sufiksu, zwracamy oryginalny wynik
-    }
-    return result.substring(0, separatorIndex); // Usuwamy część po "/"
-}
-
-
-
-
-/**
- * Funkcja zamykająca okienko z wynikami
- */
-function closeMatchModal() {
-    const modal = document.getElementById('match-modal');
-    modal.style.display = 'none';
-}
-
-/**
- * Funkcja zamykająca okienko z wynikami
- */
-function closeMatchModal() {
-    const modal = document.getElementById('match-modal');
-    modal.style.display = 'none';
-}
-
+            /**
+             * Funkcja zamykająca okienko z wynikami
+             */
+            function closeMatchModal() {
+                const modal = document.getElementById('match-modal');
+                modal.style.display = 'none';
+            }
 
             /**
              * Funkcja tworząca wiersz zawodnika i wiersz szczegółów
@@ -305,8 +336,6 @@ function closeMatchModal() {
 
                 const row1 = formaArray.slice(0, half).map(val => getSymbol(val)).join('');
                 const row2 = formaArray.slice(half).map(val => getSymbol(val)).join('');
-
-
 
                 let avatarUrl;
                 let zawodnikIndex;
@@ -383,47 +412,42 @@ function closeMatchModal() {
              * @param {string} zawodnik - Nazwa zawodnika.
              * @param {HTMLElement} detailsRow - Wiersz szczegółów zawodnika.
              */
-             function toggleDetails(zawodnik, detailsRow) {
-    const isExpanded = expandedRows.has(zawodnik);
-    const matches = detailsRow.querySelectorAll('.match'); // Znajdź wszystkie mecze w kontenerze
+            function toggleDetails(zawodnik, detailsRow) {
+                const isExpanded = expandedRows.has(zawodnik);
+                const matches = detailsRow.querySelectorAll('.match'); // Znajdź wszystkie mecze w kontenerze
 
-    if (isExpanded) {
-        // Kontener jest rozwinięty, więc zamykamy go
-        matches.forEach((match) => {
-            match.style.opacity = '0';  // Ustaw opacity na 0, aby przygotować do animacji przy ponownym otwarciu
-            match.style.transform = 'translateY(10px)';  // Reset transform do początkowej wartości
-            match.style.animation = 'none'; // Usuń aktualną animację
-        });
-        
-        detailsRow.classList.remove('expanded');
-        expandedRows.delete(zawodnik);
-    } else {
-        detailsRow.classList.add('expanded');
-        expandedRows.add(zawodnik);
+                if (isExpanded) {
+                    // Kontener jest rozwinięty, więc zamykamy go
+                    matches.forEach((match) => {
+                        match.style.opacity = '0';  // Ukryj mecze
+                        match.style.transform = 'translateY(10px)';  // Resetuj transformację
+                        match.style.animation = 'none'; // Usuń animację
+                    });
 
-        // Trigger a reflow to ensure the animation starts after expansion
-        matches.forEach((match, index) => {
-            match.style.animation = 'none'; // Reset the animation to force reflow
-            match.offsetHeight; // Force reflow to apply the changes
+                    detailsRow.classList.remove('expanded');
+                    expandedRows.delete(zawodnik);
+                } else {
+                    detailsRow.classList.add('expanded');
+                    expandedRows.add(zawodnik);
 
-            // Pobieranie aktualnej klasy animacji (może być 'blink-red', 'blink-green', 'blink-yellow')
-            const backgroundStyle = match.classList.contains('blink-red') 
-                                    ? 'blink-border-red' 
-                                    : match.classList.contains('blink-green') 
-                                    ? 'blink-border-green' 
-                                    : match.classList.contains('blink-yellow') 
-                                    ? 'blink-border-yellow' 
-                                    : '';
+                    matches.forEach((match, index) => {
+                        match.style.animation = 'none'; // Resetuj bieżącą animację
+                        match.offsetHeight; // Wymuś reflow
 
-            // Przypisanie odpowiedniej animacji z lekkim opóźnieniem, aby animacja była płynna
-            match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s, ${backgroundStyle} 1s infinite`; 
-        });
-    }
-}
+                        // Definiujemy backgroundStyle wewnątrz pętli dla każdego meczu
+                        const backgroundStyle = match.classList.contains('blink-red')
+                            ? 'blink-border-red'
+                            : match.classList.contains('blink-green')
+                            ? 'blink-border-green'
+                            : match.classList.contains('blink-yellow')
+                            ? 'blink-border-yellow'
+                            : '';
 
-
-
-
+                        // Dodaj opóźnioną animację dla każdego meczu
+                        match.style.animation = `fadeInMatch 1s ease forwards ${index * 0.05}s, ${backgroundStyle} 1s infinite`;
+                    });
+                }
+            }
 
             /**
              * Funkcja do generowania symboli na podstawie wartości
@@ -444,144 +468,142 @@ function closeMatchModal() {
              * Funkcja aktualizująca istniejące dane, zamiast dodawania nowych
              * @param {boolean} isInitialLoad - Czy to pierwsze ładowanie danych.
              */
+            async function loadAndDisplayData(isInitialLoad = false) {
+                const spinner = document.getElementById('loading-spinner');
+                if (isInitialLoad) {
+                    spinner.classList.add('active'); // Pokaż spinner
+                }
 
+                const data = await fetchData();  // Pobranie danych z API
 
+                if (isInitialLoad) {
+                    spinner.classList.remove('active'); // Ukryj spinner po zakończeniu ładowania
+                }
 
+                if (!data) {
+                    console.error('Brak danych do wyświetlenia.');
+                    return;
+                }
 
-             async function loadAndDisplayData(isInitialLoad = false) {
-    const data = await fetchData();  // Pobranie danych z API
+                try {
+                    const playersData = data.WWW;  // Dane zawodników
+                    const resultsData = data.Wyniki;  // Dane wyników
+                    const tableBody = document.getElementById('table-body');
 
-    if (!data) {
-        console.error('Brak danych do wyświetlenia.');
-        return;
-    }
+                    const newDataMap = new Map();  // Tworzymy mapę nowych danych
+                    playersData.slice(1).forEach((row) => {  // Pomijamy nagłówek
+                        const zawodnik = row[2];  // Nazwa zawodnika
+                        newDataMap.set(zawodnik, row);  // Mapujemy dane
+                    });
 
-    try {
-        const playersData = data.WWW;  // Dane zawodników
-        const resultsData = data.Wyniki;  // Dane wyników
-        const tableBody = document.getElementById('table-body');
+                    const wynikIndex = 4;  // Indeks kolumny 'Wynik'
 
-        const newDataMap = new Map();  // Tworzymy mapę nowych danych
-        playersData.slice(1).forEach((row) => {  // Pomijamy nagłówek
-            const zawodnik = row[2];  // Nazwa zawodnika
-            newDataMap.set(zawodnik, row);  // Mapujemy dane
-        });
+                    newDataMap.forEach((newPlayerData, zawodnik) => {
+                        const existingEntry = currentData.get(zawodnik);  // Sprawdzamy, czy zawodnik już istnieje w currentData
+                        const zawodnikIndex = getZawodnikIndex(zawodnik);
 
-        const wynikIndex = 4;  // Indeks kolumny 'Wynik'
+                        if (zawodnikIndex === -1) {
+                            console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
+                            return;
+                        }
 
-        newDataMap.forEach((newPlayerData, zawodnik) => {
-            const existingEntry = currentData.get(zawodnik);  // Sprawdzamy, czy zawodnik już istnieje w currentData
-            const zawodnikIndex = getZawodnikIndex(zawodnik);
+                        const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
 
-            if (zawodnikIndex === -1) {
-                console.warn(`Nie znaleziono indeksu dla zawodnika: ${zawodnik}`);
-                return;
-            }
+                        let hasPlayerDataChanged = false;
+                        let hasMatchDataChanged = false;
 
-            const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+                        // Porównujemy stare dane z nowymi, aby wykryć zmiany
+                        if (existingEntry) {
+                            hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
+                            hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
+                        } else {
+                            hasPlayerDataChanged = true;
+                            hasMatchDataChanged = true;
+                        }
 
-            let hasPlayerDataChanged = false;
-            let hasMatchDataChanged = false;
+                        const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
+                        const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
 
-            // Porównujemy stare dane z nowymi, aby wykryć zmiany
-            if (existingEntry) {
-                hasPlayerDataChanged = JSON.stringify(existingEntry.playerData) !== JSON.stringify(newPlayerData);
-                hasMatchDataChanged = JSON.stringify(existingEntry.matchData) !== JSON.stringify(newMatchData);
-            } else {
-                hasPlayerDataChanged = true;
-                hasMatchDataChanged = true;
-            }
+                        // Sprawdzenie pozycji zawodnika (czy uległa zmianie)
+                        const currentRanking = existingPlayerRow ? parseInt(existingPlayerRow.querySelector('td').innerText, 10) : -1;
+                        const newRanking = parseInt(newPlayerData[0], 10);  // Odczytujemy ranking z nowych danych
+                        const positionChanged = currentRanking !== newRanking;
 
-            const existingPlayerRow = document.querySelector(`tr.player-row[data-zawodnik="${zawodnik}"]`);
-            const existingDetailsRow = document.querySelector(`tr.details-row[data-zawodnik="${zawodnik}"]`);
+                        // Sprawdzamy, czy kontener z wynikami jest otwarty
+                        const wasExpanded = expandedRows.has(zawodnik);
 
-            // Sprawdzenie pozycji zawodnika (czy uległa zmianie)
-            const currentRanking = existingPlayerRow ? parseInt(existingPlayerRow.querySelector('td').innerText, 10) : -1;
-            const newRanking = parseInt(newPlayerData[0], 10);  // Odczytujemy ranking z nowych danych
-            const positionChanged = currentRanking !== newRanking;
+                        // Jeśli dane zawodnika lub jego mecze się zmieniły
+                        if (hasPlayerDataChanged || hasMatchDataChanged) {
+                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
 
-            // Sprawdzamy, czy kontener z wynikami jest otwarty
-            const wasExpanded = expandedRows.has(zawodnik);
+                            // Aktualizujemy wiersze, które już istnieją
+                            if (existingPlayerRow && existingDetailsRow) {
+                                existingPlayerRow.innerHTML = playerRow.innerHTML;  // Aktualizacja zawartości wiersza
+                                existingDetailsRow.innerHTML = detailsRow.innerHTML;  // Aktualizacja zawartości szczegółów
 
-            // Jeśli dane zawodnika lub jego mecze się zmieniły
-            if (hasPlayerDataChanged || hasMatchDataChanged) {
-                const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+                                // **Jeżeli kontener był otwarty, renderujemy nową zawartość z nowych danych**
+                                if (wasExpanded && !positionChanged) {
+                                    const newMatchHTML = generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex);
+                                    existingDetailsRow.querySelector('.matches-row').innerHTML = newMatchHTML;  // Zaktualizuj zawartość
 
-                // Aktualizujemy wiersze, które już istnieją
-                if (existingPlayerRow && existingDetailsRow) {
-                    existingPlayerRow.innerHTML = playerRow.innerHTML;  // Aktualizacja zawartości wiersza
-                    existingDetailsRow.innerHTML = detailsRow.innerHTML;  // Aktualizacja zawartości szczegółów
+                                    // **Dodajemy klasę `fade-in-match` po renderowaniu nowych danych** 
+                                    const matches = existingDetailsRow.querySelectorAll('.match');
+                                    matches.forEach((match, index) => {
+                                        setTimeout(() => {
+                                            match.classList.add('fade-in-match');
+                                        }, index * 100); // Dodajemy małe opóźnienie dla każdej animacji
+                                    });
 
-                    // **Jeżeli kontener był otwarty, renderujemy nową zawartość z nowych danych**
-                    if (wasExpanded && !positionChanged) {
-                        const newMatchHTML = generateMatchesHTML(resultsData, zawodnikIndex, wynikIndex);
-                        existingDetailsRow.querySelector('.matches-row').innerHTML = newMatchHTML;  // Zaktualizuj zawartość
+                                    existingDetailsRow.classList.add('expanded');  // Utrzymanie otwartego kontenera
+                                    expandedRows.add(zawodnik);  // Dodajemy ponownie zawodnika do zestawu rozwiniętych kontenerów
+                                }
+                            } else {
+                                // Jeśli wiersz zawodnika nie istnieje, dodajemy nowy wiersz i szczegóły
+                                tableBody.appendChild(playerRow);
+                                tableBody.appendChild(detailsRow);
+                            }
 
-                        // **Dodajemy klasę `fade-in-match` po renderowaniu nowych danych** 
-                        const matches = existingDetailsRow.querySelectorAll('.match');
-                        matches.forEach((match, index) => {
+                            // Sprawdź, czy pozycja zawodnika się zmieniła
+                            if (positionChanged) {
+                                // Zamknij kontener wyników, jeśli zawodnik zmienił pozycję
+                                if (existingDetailsRow) {
+                                    existingDetailsRow.classList.remove('expanded');
+                                }
+                                expandedRows.delete(zawodnik);  // Usuwamy zawodnika z listy rozwiniętych kontenerów
+                            }
+
+                            // Przesuń istniejący wiersz na odpowiednią pozycję w tabeli
+                            const targetPosition = Array.from(tableBody.children).findIndex(
+                                row => parseInt(row.querySelector('td').innerText, 10) > newRanking
+                            );
+
+                            if (targetPosition !== -1) {
+                                // Przenieś wiersze w odpowiednie miejsce
+                                tableBody.insertBefore(existingPlayerRow || playerRow, tableBody.children[targetPosition]);
+                                tableBody.insertBefore(existingDetailsRow || detailsRow, tableBody.children[targetPosition + 1]);
+                            } else {
+                                // Jeśli zawodnik ma być na końcu tabeli
+                                tableBody.appendChild(existingPlayerRow || playerRow);
+                                tableBody.appendChild(existingDetailsRow || detailsRow);
+                            }
+
+                            // Dodaj klasę podświetlenia dla wizualnego wskazania zmiany
+                            (existingPlayerRow || playerRow).classList.add('highlight');
+
+                            // Usunięcie klasy podświetlenia po 5 sekundach
                             setTimeout(() => {
-                                match.classList.add('fade-in-match');
-                            }, index * 100); // Dodajemy małe opóźnienie dla każdej animacji
-                        });
+                                (existingPlayerRow || playerRow).classList.remove('highlight');
+                            }, 5000);
 
-                        existingDetailsRow.classList.add('expanded');  // Utrzymanie otwartego kontenera
-                        expandedRows.add(zawodnik);  // Dodajemy ponownie zawodnika do zestawu rozwiniętych kontenerów
-                    }
+                            // Aktualizacja currentData
+                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Błąd podczas przetwarzania danych:', error);
                 }
-
-                // Sprawdź, czy pozycja zawodnika się zmieniła
-                if (positionChanged) {
-                    // Zamknij kontener wyników, jeśli zawodnik zmienił pozycję
-                    expandedRows.delete(zawodnik);  // Usuwamy zawodnika z listy rozwiniętych kontenerów
-                    existingDetailsRow.classList.remove('expanded');
-                }
-
-                // Przesuń istniejący wiersz na odpowiednią pozycję w tabeli
-                const targetPosition = Array.from(tableBody.children).findIndex(
-                    row => parseInt(row.querySelector('td').innerText, 10) > newRanking
-                );
-
-                if (targetPosition !== -1) {
-                    // Przenieś wiersze w odpowiednie miejsce
-                    tableBody.insertBefore(existingPlayerRow, tableBody.children[targetPosition]);
-                    tableBody.insertBefore(existingDetailsRow, tableBody.children[targetPosition + 1]);
-                } else {
-                    // Jeśli zawodnik ma być na końcu tabeli
-                    tableBody.appendChild(existingPlayerRow);
-                    tableBody.appendChild(existingDetailsRow);
-                }
-
-                // Dodaj klasę podświetlenia dla wizualnego wskazania zmiany
-                existingPlayerRow.classList.add('highlight');
-
-                // Usunięcie klasy podświetlenia po 5 sekundach
-                setTimeout(() => {
-                    existingPlayerRow.classList.remove('highlight');
-                }, 5000);
-
-                // Aktualizacja currentData
-                currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
             }
-        });
-
-    } catch (error) {
-        console.error('Błąd podczas przetwarzania danych:', error);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             /**
              * Funkcja do pobierania indeksu zawodnika w danych Wyniki
@@ -619,140 +641,136 @@ function closeMatchModal() {
                 }
             });
 
-
             const menuIcon = document.getElementById('menu-icon');
-    const menuContent = document.getElementById('menu-content');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const links = document.querySelectorAll('.menu-link');
+            const menuContent = document.getElementById('menu-content');
+            const menuOverlay = document.getElementById('menu-overlay');
+            const links = document.querySelectorAll('.menu-link');
 
-    // Funkcja otwierająca i zamykająca menu
-    menuIcon.addEventListener('click', () => {
-        menuContent.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    });
+            // Funkcja otwierająca i zamykająca menu
+            menuIcon.addEventListener('click', () => {
+                menuContent.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+            });
 
-    // Kliknięcie w ciemne tło zamyka menu
-    menuOverlay.addEventListener('click', () => {
-        menuContent.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
+            // Kliknięcie w ciemne tło zamyka menu
+            menuOverlay.addEventListener('click', () => {
+                menuContent.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
 
-    // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
-    menuContent.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!target.classList.contains('menu-link')) {
-            menuContent.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        }
-    });
-
+            // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
+            menuContent.addEventListener('click', (event) => {
+                const target = event.target;
+                if (!target.classList.contains('menu-link')) {
+                    menuContent.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                }
+            });
 
             /**
              * Funkcja inicjująca ładowanie danych
              */
-            /**
- * Funkcja inicjująca ładowanie danych
- */
- window.onload = () => {
-    // **Dodaj poniższy blok, aby załadować dane z localStorage jeśli istnieją**
-    const storedData = localStorage.getItem('betligaData');
-    if (storedData) {
-        const data = JSON.parse(storedData);
-        try {
-            const playersData = data.WWW;
-            const resultsData = data.Wyniki;
-            const tableBody = document.getElementById('table-body');
+            window.onload = async () => {
+                const spinner = document.getElementById('loading-spinner');
+                const storedData = localStorage.getItem('betligaData');
 
-            tableBody.innerHTML = ''; // Wyczyść tabelę przy ładowaniu z localStorage
-            document.querySelector('table.leaderboard').classList.add('fade-in');
+                if (storedData) {
+                    // Jeśli dane są w localStorage, załaduj je
+                    spinner.classList.add('active'); // Pokaż spinner podczas ładowania danych z localStorage
 
-            // Tworzenie mapy nowych danych dla łatwego dostępu
-            const newDataMap = new Map();
-            playersData.slice(1).forEach((row) => { // Pomijamy nagłówek
-                const zawodnik = row[2];
-                newDataMap.set(zawodnik, row);
-            });
+                    try {
+                        const data = JSON.parse(storedData);
+                        const playersData = data.WWW;  // Dane zawodników
+                        const resultsData = data.Wyniki;  // Dane wyników
+                        const tableBody = document.getElementById('table-body');
 
-            const wynikIndex = 4; // Indeks kolumny 'Wynik'
+                        tableBody.innerHTML = ''; // Wyczyść tabelę
 
-            newDataMap.forEach((newPlayerData, zawodnik) => {
-    const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
-    tableBody.appendChild(playerRow);
-    tableBody.appendChild(detailsRow);
+                        const newDataMap = new Map();
+                        playersData.slice(1).forEach((row) => {
+                            const zawodnik = row[2];
+                            newDataMap.set(zawodnik, row);
+                        });
 
-    // **Dodaj poniższą linię, aby zaktualizować currentData**
-    const zawodnikIndex = getZawodnikIndex(zawodnik);
-    const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
-    currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
-});
+                        const wynikIndex = 4;
 
-        } catch (error) {
-            console.error('Błąd podczas przetwarzania danych z localStorage:', error);
-        }
-    }
+                        newDataMap.forEach((newPlayerData, zawodnik) => {
+                            const { playerRow, detailsRow } = createPlayerRow(newPlayerData, resultsData, wynikIndex);
+                            tableBody.appendChild(playerRow);
+                            tableBody.appendChild(detailsRow);
 
-    // **Zachowaj istniejące wywołanie funkcji ładowania danych z parametrem false**
-    loadAndDisplayData(false);
-};
+                            const zawodnikIndex = getZawodnikIndex(zawodnik);
+                            const newMatchData = resultsData.slice(1).map(row => row[zawodnikIndex]);
+                            currentData.set(zawodnik, { playerData: newPlayerData, matchData: newMatchData });
+                        });
 
-            setInterval(() => loadAndDisplayData(false), 5000);
+                        spinner.classList.remove('active'); // Ukryj spinner po załadowaniu danych
+                    } catch (error) {
+                        spinner.classList.remove('active'); // Ukryj spinner nawet jeśli wystąpił błąd
+                        console.error('Błąd podczas przetwarzania danych z localStorage:', error);
+                    }
+                } else {
+                    // Jeśli nie ma danych w localStorage, pobierz dane przez API
+                    await loadAndDisplayData(true);
+                }
+
+                // Ustaw interwał do odświeżania danych co 5 sekund
+                setInterval(() => loadAndDisplayData(false), 5000);
+            };
+
         </script>
     </div>
 
-
     <!-- Modal window -->
-            <div id="match-modal" class="match-modal">
-                <div class="modal-content" id="modal-content">
-                    <span class="close-button" id="close-modal">&times;</span>
-                    <div class="main-match-result">
-                        <img src="" alt="Left Team Logo" class="team-logo-large" id="left-team-logo-large">
-                        <span id="match-result-large"></span>
-                        <img src="" alt="Right Team Logo" class="team-logo-large" id="right-team-logo-large">
-                    </div>
-                    <div class="additional-matches">
-                        <div class="row">
-                            <div class="small-match" id="small-match-1">
-                                <div class="player-info">
-                                    <img src="" alt="Player 1 Avatar" class="player-avatar" id="player-avatar-1">
-                                </div>
-                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-1">
-                                <span id="small-match-result-1"></span>
-                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-1">
-                            </div>
-                            <div class="small-match" id="small-match-2">
-                                <div class="player-info">
-                                    <img src="" alt="Player 2 Avatar" class="player-avatar" id="player-avatar-2">
-                                </div>
-                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-2">
-                                <span id="small-match-result-2"></span>
-                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-2">
-                            </div>
+    <div id="match-modal" class="match-modal">
+        <div class="modal-content" id="modal-content">
+            <span class="close-button" id="close-modal">&times;</span>
+            <div class="main-match-result">
+                <img src="" alt="Left Team Logo" class="team-logo-large" id="left-team-logo-large">
+                <span id="match-result-large"></span>
+                <img src="" alt="Right Team Logo" class="team-logo-large" id="right-team-logo-large">
+            </div>
+            <div class="additional-matches">
+                <div class="row">
+                    <div class="small-match" id="small-match-1">
+                        <div class="player-info">
+                            <img src="" alt="Player 1 Avatar" class="player-avatar" id="player-avatar-1">
                         </div>
-                        <div class="row">
-                            <div class="small-match" id="small-match-3">
-                                <div class="player-info">
-                                    <img src="" alt="Player 3 Avatar" class="player-avatar" id="player-avatar-3">
-                                </div>
-                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-3">
-                                <span id="small-match-result-3"></span>
-                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-3">
-                            </div>
-                            <div class="small-match" id="small-match-4">
-                                <div class="player-info">
-                                    <img src="" alt="Player 4 Avatar" class="player-avatar" id="player-avatar-4">
-                                </div>
-                                <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-4">
-                                <span id="small-match-result-4"></span>
-                                <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-4">
-                            </div>
-                        </div>
-                        
+                        <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-1">
+                        <span id="small-match-result-1"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-1">
                     </div>
-                   
+                    <div class="small-match" id="small-match-2">
+                        <div class="player-info">
+                            <img src="" alt="Player 2 Avatar" class="player-avatar" id="player-avatar-2">
+                        </div>
+                        <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-2">
+                        <span id="small-match-result-2"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-match" id="small-match-3">
+                        <div class="player-info">
+                            <img src="" alt="Player 3 Avatar" class="player-avatar" id="player-avatar-3">
+                        </div>
+                        <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-3">
+                        <span id="small-match-result-3"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-3">
+                    </div>
+                    <div class="small-match" id="small-match-4">
+                        <div class="player-info">
+                            <img src="" alt="Player 4 Avatar" class="player-avatar" id="player-avatar-4">
+                        </div>
+                        <img src="" alt="Left Team Logo" class="team-logo-small" id="small-left-logo-4">
+                        <span id="small-match-result-4"></span>
+                        <img src="" alt="Right Team Logo" class="team-logo-small" id="small-right-logo-4">
+                    </div>
                 </div>
             </div>
-
-
-        
+        </div>
+    </div>
 </body>
 </html>
+
+
