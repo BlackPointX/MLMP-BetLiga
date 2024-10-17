@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetLiga - Pełne wyniki</title>
+    <link rel="stylesheet" href="style2.css">
+    <style>
+        /* Dodatkowe style specyficzne dla tej strony, jeśli potrzebne */
+    </style>
+</head>
+<body>
+    <!-- Hamburger menu -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="hamburger-menu">
+        <div class="menu-icon" id="menu-icon">
+            &#9776; <!-- Symbol hamburgera -->
+        </div>
+        <nav class="menu-content" id="menu-content">
+            <ul>
+                <li><a href="index2.html" class="menu-link">MŁMP Bet Liga</a></li>
+            </ul>
+        </nav>
+    </div>
+   
+    <div class="container" style="width: 95%;">
+        <div class="header">
+            <h1>BetLiga - Pełne Wyniki</h1>
+        </div>
+
+        <div class="match-results">
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">Gosp</th>
+                        <th style="width: 6%;">Wynik</th>
+                        <th style="width: 6%;">Gość</th>
+                        <th style="width: 8%;"><img class="player-avatar" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png" alt="Gracz 1"></th>
+                        <th style="width: 8%;"><img class="player-avatar" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png" alt="Gracz 2"></th>
+                        <th style="width: 8%;"><img class="player-avatar" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png" alt="Gracz 3"></th>
+                        <th style="width: 8%;"><img class="player-avatar" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png" alt="Gracz 4"></th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Wiersze będą dodawane dynamicznie przez JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Spinner -->
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        // Adres API
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbxpW7F9b79iZmq5lUQV3n1WADeK2MhGN6dYF7bkMsEUYSxqkyewsrhSGtO8FwMrKSLS3w/exec?page=Komplet';
+
+        /**
+         * Funkcja pobierająca dane z API
+         */
+        async function fetchMatchResults() {
+            const spinner = document.getElementById('loading-spinner');
+            spinner.classList.add('active'); // Pokaż spinner podczas ładowania danych
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Błąd podczas pobierania danych');
+                }
+                const data = await response.json();
+                console.log("Dane Komplet:", data.Komplet); // Wyświetlenie danych w konsoli
+
+                // Sprawdzanie, czy dane istnieją i mają odpowiednią strukturę
+                if (!data.Komplet || !Array.isArray(data.Komplet) || data.Komplet.length < 2) {
+                    throw new Error('Dane z arkusza "Komplet" są niekompletne lub niepoprawne.');
+                }
+
+                populateTable(data.Komplet);
+                spinner.classList.remove('active'); // Ukryj spinner po załadowaniu danych
+            } catch (error) {
+                console.error('Błąd podczas pobierania danych:', error);
+                spinner.classList.remove('active'); // Ukryj spinner nawet jeśli wystąpił błąd
+                alert('Wystąpił problem z pobraniem danych. Proszę spróbować później.');
+            }
+        }
+
+        const menuIcon = document.getElementById('menu-icon');
+    const menuContent = document.getElementById('menu-content');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const links = document.querySelectorAll('.menu-link');
+
+    // Funkcja otwierająca i zamykająca menu
+    menuIcon.addEventListener('click', () => {
+        menuContent.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    });
+
+    // Kliknięcie w ciemne tło zamyka menu
+    menuOverlay.addEventListener('click', () => {
+        menuContent.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+    // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
+    menuContent.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.classList.contains('menu-link')) {
+            menuContent.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
+    });
+
+        /**
+         * Funkcja wypełniająca tabelę danymi
+         * @param {Array} data - Dane z arkusza "Komplet"
+         */
+        function populateTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = ''; // Wyczyść istniejące dane
+
+            // Zakładamy, że pierwszy wiersz to nagłówki
+            for (let i = 1; i < data.length; i++) {
+                const rowData = data[i];
+
+                // Sprawdzenie długości wiersza
+                if (rowData.length < 10) {
+                    console.warn(`Wiersz ${i} ma niewystarczającą liczbę kolumn.`);
+                    continue;
+                }
+
+                const team1 = rowData[1];
+                const result = rowData[2];
+                const team2 = rowData[3];
+                
+                const leftTeamLogo = rowData[0];  // Logo lewej drużyny
+                const rightTeamLogo = rowData[4]; // Logo prawej drużyny
+
+                const player1 = rowData[6];
+                const player2 = rowData[7];
+                const player3 = rowData[8];
+                const player4 = rowData[9];
+
+                // Funkcja do parsowania wyniku i przypisania klasy
+                function parseResult(resultString) {
+                    const separatorIndex = resultString.lastIndexOf('/');
+                    if (separatorIndex === -1) {
+                        return { displayResult: resultString, className: 'red' }; // Domyślnie czerwony
+                    }
+
+                    const displayPart = resultString.substring(0, separatorIndex).trim();
+                    const suffix = resultString.substring(separatorIndex + 1).toLowerCase();
+
+                    // Mapowanie sufiksów na klasy CSS
+                    const classMap = {
+                        'g': 'green',
+                        'y': 'yellow',
+                        'r': 'red',
+                        'gl': 'blink-green',
+                        'yl': 'blink-yellow',
+                        'rl': 'blink-red'
+                    };
+
+                    return {
+                        displayResult: displayPart,
+                        className: classMap[suffix] || 'red' // Domyślnie czerwony
+                    };
+                }
+
+                // Parsowanie wyników graczy
+                const parsedPlayer1 = parseResult(rowData[6]);
+                const parsedPlayer2 = parseResult(rowData[7]);
+                const parsedPlayer3 = parseResult(rowData[8]);
+                const parsedPlayer4 = parseResult(rowData[9]);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="team"><img class="team-logo" src="${leftTeamLogo}" alt="${team1}"></td>
+                    <td class="result">${result}</td>
+                    <td class="team"><img class="team-logo" src="${rightTeamLogo}" alt="${team2}"></td>
+                    <td class="results-col">
+                        <div class="result-box ${parsedPlayer1.className}">${parsedPlayer1.displayResult}</div>
+                    </td>
+                    <td class="results-col">
+                        <div class="result-box ${parsedPlayer2.className}">${parsedPlayer2.displayResult}</div>
+                    </td>
+                    <td class="results-col">
+                        <div class="result-box ${parsedPlayer3.className}">${parsedPlayer3.displayResult}</div>
+                    </td>
+                    <td class="results-col">
+                        <div class="result-box ${parsedPlayer4.className}">${parsedPlayer4.displayResult}</div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Inicjalizacja po załadowaniu strony
+        window.onload = fetchMatchResults;
+    </script>
+</body>
+</html>
