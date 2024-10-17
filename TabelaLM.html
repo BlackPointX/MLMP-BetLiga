@@ -55,7 +55,7 @@
 
     <script>
         // Adres API
-        const apiUrl = 'https://script.google.com/macros/s/AKfycbxpW7F9b79iZmq5lUQV3n1WADeK2MhGN6dYF7bkMsEUYSxqkyewsrhSGtO8FwMrKSLS3w/exec?page=Komplet';
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbxPKj0TKn1XMYUdf6C7JNZWrqgl6T8sT4LON9bq0lcDHDHuFda3yPd20PgDkfakvCumEg/exec?page=Komplet';
 
         /**
          * Funkcja pobierająca dane z API
@@ -87,114 +87,125 @@
         }
 
         const menuIcon = document.getElementById('menu-icon');
-    const menuContent = document.getElementById('menu-content');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const links = document.querySelectorAll('.menu-link');
+        const menuContent = document.getElementById('menu-content');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const links = document.querySelectorAll('.menu-link');
 
-    // Funkcja otwierająca i zamykająca menu
-    menuIcon.addEventListener('click', () => {
-        menuContent.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    });
+        // Funkcja otwierająca i zamykająca menu
+        menuIcon.addEventListener('click', () => {
+            menuContent.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        });
 
-    // Kliknięcie w ciemne tło zamyka menu
-    menuOverlay.addEventListener('click', () => {
-        menuContent.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
-    menuContent.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!target.classList.contains('menu-link')) {
+        // Kliknięcie w ciemne tło zamyka menu
+        menuOverlay.addEventListener('click', () => {
             menuContent.classList.remove('active');
             menuOverlay.classList.remove('active');
-        }
-    });
+        });
+
+        // Kliknięcie w pustą przestrzeń menu lub poza linkiem zamyka menu
+        menuContent.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!target.classList.contains('menu-link')) {
+                menuContent.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            }
+        });
 
         /**
          * Funkcja wypełniająca tabelę danymi
          * @param {Array} data - Dane z arkusza "Komplet"
          */
-        function populateTable(data) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = ''; // Wyczyść istniejące dane
+         function populateTable(data) {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = ''; // Wyczyść istniejące dane
 
-            // Zakładamy, że pierwszy wiersz to nagłówki
-            for (let i = 1; i < data.length; i++) {
-                const rowData = data[i];
+    // Zakładamy, że pierwszy wiersz to nagłówki
+    for (let i = 1; i < data.length; i++) {
+        const rowData = data[i];
 
-                // Sprawdzenie długości wiersza
-                if (rowData.length < 10) {
-                    console.warn(`Wiersz ${i} ma niewystarczającą liczbę kolumn.`);
-                    continue;
-                }
-
-                const team1 = rowData[1];
-                const result = rowData[2];
-                const team2 = rowData[3];
-                
-                const leftTeamLogo = rowData[0];  // Logo lewej drużyny
-                const rightTeamLogo = rowData[4]; // Logo prawej drużyny
-
-                const player1 = rowData[6];
-                const player2 = rowData[7];
-                const player3 = rowData[8];
-                const player4 = rowData[9];
-
-                // Funkcja do parsowania wyniku i przypisania klasy
-                function parseResult(resultString) {
-                    const separatorIndex = resultString.lastIndexOf('/');
-                    if (separatorIndex === -1) {
-                        return { displayResult: resultString, className: 'red' }; // Domyślnie czerwony
-                    }
-
-                    const displayPart = resultString.substring(0, separatorIndex).trim();
-                    const suffix = resultString.substring(separatorIndex + 1).toLowerCase();
-
-                    // Mapowanie sufiksów na klasy CSS
-                    const classMap = {
-                        'g': 'green',
-                        'y': 'yellow',
-                        'r': 'red',
-                        'gl': 'blink-green',
-                        'yl': 'blink-yellow',
-                        'rl': 'blink-red'
-                    };
-
-                    return {
-                        displayResult: displayPart,
-                        className: classMap[suffix] || 'red' // Domyślnie czerwony
-                    };
-                }
-
-                // Parsowanie wyników graczy
-                const parsedPlayer1 = parseResult(rowData[6]);
-                const parsedPlayer2 = parseResult(rowData[7]);
-                const parsedPlayer3 = parseResult(rowData[8]);
-                const parsedPlayer4 = parseResult(rowData[9]);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="team"><img class="team-logo" src="${leftTeamLogo}" alt="${team1}"></td>
-                    <td class="result">${result}</td>
-                    <td class="team"><img class="team-logo" src="${rightTeamLogo}" alt="${team2}"></td>
-                    <td class="results-col">
-                        <div class="result-box ${parsedPlayer1.className}">${parsedPlayer1.displayResult}</div>
-                    </td>
-                    <td class="results-col">
-                        <div class="result-box ${parsedPlayer2.className}">${parsedPlayer2.displayResult}</div>
-                    </td>
-                    <td class="results-col">
-                        <div class="result-box ${parsedPlayer3.className}">${parsedPlayer3.displayResult}</div>
-                    </td>
-                    <td class="results-col">
-                        <div class="result-box ${parsedPlayer4.className}">${parsedPlayer4.displayResult}</div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            }
+        // Sprawdzenie długości wiersza
+        if (rowData.length < 10) {
+            console.warn(`Wiersz ${i} ma niewystarczającą liczbę kolumn.`);
+            continue;
         }
+
+        const team1 = rowData[1];
+        const result = rowData[2];
+        const team2 = rowData[3];
+        
+        const leftTeamLogo = rowData[0];  // Logo lewej drużyny
+        const rightTeamLogo = rowData[4]; // Logo prawej drużyny
+
+        const player1 = rowData[6];
+        const player2 = rowData[7];
+        const player3 = rowData[8];
+        const player4 = rowData[9];
+
+        // Funkcja do parsowania wyniku i przypisania klasy
+        function parseResult(resultString) {
+            const separatorIndex = resultString.lastIndexOf('/');
+            if (separatorIndex === -1) {
+                return { displayResult: resultString, className: '' }; // Domyślnie czerwony
+            }
+
+            const displayPart = resultString.substring(0, separatorIndex).trim();
+            const suffix = resultString.substring(separatorIndex + 1).toLowerCase();
+
+            // Mapowanie sufiksów na klasy CSS
+            const classMap = {
+                'g': 'green',
+                'y': 'yellow',
+                'r': 'red',
+                'gl': 'blink-green',
+                'yl': 'blink-yellow',
+                'rl': 'blink-red'
+            };
+
+            return {
+                displayResult: displayPart,
+                className: classMap[suffix] || 'red' // Domyślnie czerwony
+            };
+        }
+
+        // Parsowanie wyników graczy
+        const parsedPlayer1 = parseResult(player1);
+        const parsedPlayer2 = parseResult(player2);
+        const parsedPlayer3 = parseResult(player3);
+        const parsedPlayer4 = parseResult(player4);
+
+        // Tworzenie nowego wiersza z klasą 'player-row'
+        const row = document.createElement('tr');
+        row.classList.add('player-row'); // Dodanie klasy
+        row.innerHTML = `
+            <td class="team"><img class="team-logo" src="${leftTeamLogo}" alt="${team1}"></td>
+            <td class="result">${result}</td>
+            <td class="team"><img class="team-logo" src="${rightTeamLogo}" alt="${team2}"></td>
+            <td class="results-col">
+                <div class="result-box ${parsedPlayer1.className}">${parsedPlayer1.displayResult}</div>
+            </td>
+            <td class="results-col">
+                <div class="result-box ${parsedPlayer2.className}">${parsedPlayer2.displayResult}</div>
+            </td>
+            <td class="results-col">
+                <div class="result-box ${parsedPlayer3.className}">${parsedPlayer3.displayResult}</div>
+            </td>
+            <td class="results-col">
+                <div class="result-box ${parsedPlayer4.className}">${parsedPlayer4.displayResult}</div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    // Opcjonalnie: Dodanie klasy 'fade-in-row' do animacji
+    const rows = tbody.querySelectorAll('tr.player-row');
+    rows.forEach((row, index) => {
+        setTimeout(() => {
+            row.classList.add('fade-in-row');
+        }, index * 100); // Opóźnienie dla efektu animacji
+    });
+}
+
 
         // Inicjalizacja po załadowaniu strony
         window.onload = fetchMatchResults;
