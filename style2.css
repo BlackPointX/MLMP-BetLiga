@@ -48,6 +48,7 @@ body {
 /* Tabela */
 .table-container {
     margin-top: 15px;
+    opacity: 0.9;
 }
 
 table.leaderboard {
@@ -59,7 +60,7 @@ table.leaderboard {
     table-layout: fixed;
     opacity: 1;
     transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 1s ease, transform 1s ease;
 }
 
 table.leaderboard.fade-in {
@@ -76,7 +77,8 @@ table.leaderboard th, table.leaderboard td {
     padding: 6px;
     text-align: center;
     color: white;
-    font-size: 0.85em;
+    
+    
 }
 
 table.leaderboard td {
@@ -91,9 +93,10 @@ table.leaderboard th:nth-child(2),
 table.leaderboard td:nth-child(2) {
     width: 30%;
     /* Remove display: flex; align-items; justify-content */
-    text-align: left; /* Wyśrodkowanie zawartości */
+    text-align: center; /* Wyśrodkowanie zawartości */
     vertical-align: middle; /* Wyśrodkowanie w pionie */
     white-space: nowrap; /* Zapobiega łamaniu linii */
+    font-size: 1em;
 }
 
 table.leaderboard th:nth-child(3), table.leaderboard td:nth-child(3) {
@@ -106,6 +109,7 @@ table.leaderboard th:nth-child(4), table.leaderboard td:nth-child(4) {
 
 table.leaderboard th:nth-child(5), table.leaderboard td:nth-child(5) {
     width: 10%;
+    
 }
 
 table.leaderboard th:nth-child(6), table.leaderboard td:nth-child(6) {
@@ -124,12 +128,13 @@ table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
 }
 
 .avatar img {
-    width: 30px; /* Ustaw odpowiednią szerokość */
+    width: 40px; /* Ustaw odpowiednią szerokość */
 }
 
 .avatar span {
     /* Umożliwia, aby imię było wyśrodkowane w pionie */
     line-height: normal; /* Ustal linię wysokości równą wysokości avatara */
+    font-size: 1.2em;
 }
 
 /* Styl dla zmienionego wiersza */
@@ -184,6 +189,8 @@ table.leaderboard tbody tr.details-row .details-placeholder {
     transition: opacity 0.5s ease;
 }
 
+
+
 table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     opacity: 1;
 }
@@ -198,13 +205,13 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 }
 
 .points .pkt {
-    font-size: 1.2em; /* Większy rozmiar czcionki dla punktów */
+    font-size: 1.3em; /* Większy rozmiar czcionki dla punktów */
     color: white;
     line-height: 1; /* Zmniejszamy odstępy między liniami */
 }
 
 .points .plus-pkt {
-    font-size: 0.75em; /* Mniejszy rozmiar czcionki dla dodatkowych punktów */
+    font-size: 0.9em; /* Mniejszy rozmiar czcionki dla dodatkowych punktów */
     color: #21e821; /* Zielona czcionka */
     margin-top: 2px; /* Zmniejszenie odstępu między punktami */
     text-align: center;
@@ -212,7 +219,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 }
 
 .bramki {
-    font-size: 0.9em;
+    font-size: 1.2em;
     color: #fff;
     display: inline-block;
     vertical-align: middle;
@@ -223,8 +230,12 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     font-size: 0.9em;
     color: #fff;
     display: inline-block;
-    vertical-align: middle;
-    margin-right: 1px;
+}
+
+.ranking {
+    font-size: 1.3em;
+    color: #fff;
+    display: inline-block;
 }
 
 /* Kontener na kropki z formą zawodników */
@@ -286,6 +297,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     box-sizing: border-box;
     opacity: 0;
     transform: translateY(10px);
+    font-size: 1.2em;
 }
 
 .match.fade-in-match {
@@ -296,7 +308,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 
 /* Styl dla logo drużyn */
 .team-logo {
-    height: 20px;
+    height: 30px;
     object-fit: cover;
     border-radius: 0%;
 }
@@ -353,9 +365,13 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     }
 }
 
+#loading-spinner.active {
+    display: block;
+}
+
 /* Animacja pojawiania się wierszy */
 .fade-in-row {
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 2s ease-in-out;
 }
 
 @keyframes fadeIn {
@@ -533,6 +549,32 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     border-radius: 5px;
 }
 
+.result-box {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px 5px;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Styl dla podświetlenia poprawnych wyników meczów */
+.result-box.green {
+    background-color:#057c05; /* Jasnozielony kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia trafionych kategorii */
+.result-box.yellow {
+    background-color: #a79907; /* Jasnożółty kolor */
+    border-radius: 5px;
+}
+
+/* Styl dla podświetlenia nietrafionych wyników */
+.result-box.red {
+    background-color: #a10808; /* Jasnoczerwony kolor */
+    border-radius: 5px;
+}
+
+
 /* Styl dla animacji fade-in dla wierszy szczegółów */
 .details-row.expanded {
     display: table-row;
@@ -655,7 +697,7 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
 
 /* Zaktualizowane stylowanie dla avatarów bez imion */
 .player-avatar {
-    width: 20%;
+    width: 90%;
     object-fit: cover;
 }
 
