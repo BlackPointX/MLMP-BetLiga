@@ -891,3 +891,104 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     z-index: 999; /* Aby wiersz kolejki znajdował się nad sticky-row */
 }
 
+
+
+
+
+
+/* Dodany kod 
+
+/* Popup Overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Ciemne tło */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Popup Content */
+.popup-content {
+    background-color: #1a1a3d; /* Ciemne tło wewnątrz popupu */
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    color: white; /* Tekst biały */
+}
+
+.popup-content h2 {
+    margin: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.popup-content .match-logos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.popup-content .match-logos img {
+    width: 60px;
+    height: 60px;
+}
+
+.popup-content .team-names {
+    text-align: center;
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.popup-content .match-score {
+    text-align: center;
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+.popup-content .players-results {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-content .player-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+.popup-content .player-result img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.popup-content .result-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-size: 1.2em;
+}
+
+.popup-content .green {
+    background-color: rgba(0, 255, 0, 0.6);
+}
+
+.popup-content .red {
+    background-color: rgba(255, 0, 0, 0.6);
+}
+
+.popup-content .yellow {
+    background-color: rgba(255, 255, 0, 0.6);
+}
