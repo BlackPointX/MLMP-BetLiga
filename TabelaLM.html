@@ -120,21 +120,31 @@
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = ''; // Wyczyść istniejące dane
 
-// Dodaj separator nad pierwszym spotkaniem
-const firstSeparatorRow = document.createElement('tr');
-firstSeparatorRow.classList.add('separator-row');
-firstSeparatorRow.innerHTML = `
-    <td colspan="7" class="separator">Kolejka 1</td>
-`;
-tbody.appendChild(firstSeparatorRow);
-
+    // Na sztywno dodajemy separator dla Kolejki 1 na samej górze
+    const firstSeparatorRow = document.createElement('tr');
+    firstSeparatorRow.classList.add('separator-row');
+    firstSeparatorRow.innerHTML = `
+        <td colspan="7" class="separator">Kolejka 1</td>
+    `;
+    tbody.appendChild(firstSeparatorRow);
 
     // Zakładamy, że pierwszy wiersz to nagłówki
+    let totalSumMariusz = 0;
+    let totalSumLukasz = 0;
+    let totalSumMateusz = 0;
+    let totalSumPatryk = 0;
+
+    let previousSumMariusz = 0;
+    let previousSumLukasz = 0;
+    let previousSumMateusz = 0;
+    let previousSumPatryk = 0;
+    let currentMatchDay = 1;
+
     for (let i = 1; i < data.length; i++) {
         const rowData = data[i];
 
         // Sprawdzenie długości wiersza
-        if (rowData.length < 10) {
+        if (rowData.length < 15) {
             console.warn(`Wiersz ${i} ma niewystarczającą liczbę kolumn.`);
             continue;
         }
@@ -150,6 +160,17 @@ tbody.appendChild(firstSeparatorRow);
         const player2 = rowData[7];
         const player3 = rowData[8];
         const player4 = rowData[9];
+
+        const pointsMariusz = rowData[11] ? parseInt(rowData[11]) : 0;
+        const pointsLukasz = rowData[12] ? parseInt(rowData[12]) : 0;
+        const pointsMateusz = rowData[13] ? parseInt(rowData[13]) : 0;
+        const pointsPatryk = rowData[14] ? parseInt(rowData[14]) : 0;
+
+        // Sumuj punkty globalnie
+        totalSumMariusz += pointsMariusz;
+        totalSumLukasz += pointsLukasz;
+        totalSumMateusz += pointsMateusz;
+        totalSumPatryk += pointsPatryk;
 
         // Funkcja do parsowania wyniku i przypisania klasy
         function parseResult(resultString) {
@@ -175,6 +196,12 @@ tbody.appendChild(firstSeparatorRow);
                 displayResult: displayPart,
                 className: classMap[suffix] || 'red' // Domyślnie czerwony
             };
+        }
+
+        // Funkcja do formatowania liczby w nawiasie (z uwzględnieniem koloru czcionki)
+        function formatPointsChange(pointsChange) {
+            let colorStyle = pointsChange > 0 ? 'color: rgba(0, 255, 0, 0.6);' : 'color: yellow;'; // Zielony dla wartości > 0, żółty dla 0
+            return `<span class="points-change" style="font-size: smaller; ${colorStyle}">(+${pointsChange})</span>`;
         }
 
         // Parsowanie wyników graczy
@@ -205,15 +232,54 @@ tbody.appendChild(firstSeparatorRow);
         `;
         tbody.appendChild(row);
 
-        // Sprawdzenie, czy wartość w kolumnie "Dł kolejki" (indeks 10) jest niepusta
+        // Sprawdzenie, czy w kolumnie "Dł kolejki" (indeks 10) jest wartość oznaczająca zakończenie kolejki
         if (rowData[10] !== "") {
-            // Dodaj przerwę po wierszu
+            // Dodaj sumę punktów po zakończeniu kolejki
+            const sumRow = document.createElement('tr');
+            sumRow.classList.add('sum-row');
+            sumRow.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="results-col">
+                    <div class="result-box" style="font-size: larger; white-space: nowrap;">
+                        ${totalSumMariusz} ${formatPointsChange(totalSumMariusz - previousSumMariusz)}
+                    </div>
+                </td>
+                <td class="results-col">
+                    <div class="result-box" style="font-size: larger; white-space: nowrap;">
+                        ${totalSumLukasz} ${formatPointsChange(totalSumLukasz - previousSumLukasz)}
+                    </div>
+                </td>
+                <td class="results-col">
+                    <div class="result-box" style="font-size: larger; white-space: nowrap;">
+                        ${totalSumMateusz} ${formatPointsChange(totalSumMateusz - previousSumMateusz)}
+                    </div>
+                </td>
+                <td class="results-col">
+                    <div class="result-box" style="font-size: larger; white-space: nowrap;">
+                        ${totalSumPatryk} ${formatPointsChange(totalSumPatryk - previousSumPatryk)}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(sumRow);
+
+            // Dodaj separator dla nowej kolejki
             const separatorRow = document.createElement('tr');
             separatorRow.classList.add('separator-row');
             separatorRow.innerHTML = `
                 <td colspan="7" class="separator">Kolejka ${rowData[10]}</td>
             `;
             tbody.appendChild(separatorRow);
+
+            // Zaktualizuj poprzednie sumy przed rozpoczęciem nowej kolejki
+            previousSumMariusz = totalSumMariusz;
+            previousSumLukasz = totalSumLukasz;
+            previousSumMateusz = totalSumMateusz;
+            previousSumPatryk = totalSumPatryk;
+
+            // Zwiększ numer kolejki
+            currentMatchDay++;
         }
     }
 
@@ -225,6 +291,10 @@ tbody.appendChild(firstSeparatorRow);
         }, index * 100); // Opóźnienie dla efektu animacji
     });
 }
+
+
+
+
 
 
 
