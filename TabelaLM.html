@@ -303,17 +303,18 @@ function openPopup(rowData) {
     document.getElementById('popup-overlay').style.display = 'flex';
 
     // Ustaw dane chmurki
-    document.getElementById('match-date-time').textContent = "01-01-2023 18:00";
-    document.getElementById('match-league').textContent = "MŁMP Bet Liga";
+    document.getElementById('match-date-time').textContent = rowData[15];
+    document.getElementById('match-league').textContent = rowData[17];
     document.getElementById('match-team-names').textContent = `${rowData[1]} vs ${rowData[3]}`;
     document.getElementById('match-left-logo').src = rowData[0];
     document.getElementById('match-right-logo').src = rowData[4];
     document.getElementById('match-score').textContent = rowData[2];
-    document.getElementById('player-result-1').textContent = rowData[6];
-    document.getElementById('player-result-2').textContent = rowData[7];
-    document.getElementById('player-result-3').textContent = rowData[8];
-    document.getElementById('player-result-4').textContent = rowData[9];
+    document.getElementById('player-result-1').textContent = rowData[6].replace(/\/[ry]$/, '');
+    document.getElementById('player-result-2').textContent = rowData[7].replace(/\/[ry]$/, '');
+    document.getElementById('player-result-3').textContent = rowData[8].replace(/\/[ry]$/, '');
+    document.getElementById('player-result-4').textContent = rowData[9].replace(/\/[ry]$/, '');
 }
+
 
 
 window.onload = function() {
