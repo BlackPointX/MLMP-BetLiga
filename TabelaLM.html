@@ -213,6 +213,10 @@
         // Tworzenie nowego wiersza z klasą 'player-row'
         const row = document.createElement('tr');
         row.classList.add('player-row'); // Dodanie klasy
+
+ // **Tutaj należy dodać event listener dla kliknięcia**
+ row.addEventListener('click', () => openPopup(rowData)); // <--- TUTAJ DODAJ TEN KOD
+
         row.innerHTML = `
             <td class="team"><img class="team-logo" src="${leftTeamLogo}" alt="${team1}"></td>
             <td class="result">${result}</td>
@@ -295,11 +299,68 @@
 
 
 
+function openPopup(rowData) {
+    document.getElementById('popup-overlay').style.display = 'flex';
+
+    // Ustaw dane chmurki
+    document.getElementById('match-date-time').textContent = "01-01-2023 18:00";
+    document.getElementById('match-league').textContent = "MŁMP Bet Liga";
+    document.getElementById('match-team-names').textContent = `${rowData[1]} vs ${rowData[3]}`;
+    document.getElementById('match-left-logo').src = rowData[0];
+    document.getElementById('match-right-logo').src = rowData[4];
+    document.getElementById('match-score').textContent = rowData[2];
+    document.getElementById('player-result-1').textContent = rowData[6];
+    document.getElementById('player-result-2').textContent = rowData[7];
+    document.getElementById('player-result-3').textContent = rowData[8];
+    document.getElementById('player-result-4').textContent = rowData[9];
+}
 
 
+window.onload = function() {
+    fetchMatchResults();
 
-        // Inicjalizacja po załadowaniu strony
-        window.onload = fetchMatchResults;
+    // Zdarzenie zamykające popup
+    document.getElementById('popup-overlay').addEventListener('click', function() {
+        this.style.display = 'none';
+    });
+};
+
     </script>
+
+<!-- Popup for match details -->
+<div class="popup-overlay" id="popup-overlay">
+    <div class="popup-content">
+        <h2 id="match-date-time">Date and Time</h2>
+        <div class="match-logos">
+            <img id="match-left-logo" src="" alt="Left Team">
+            <span id="match-league">League Name</span>
+            <img id="match-right-logo" src="" alt="Right Team">
+        </div>
+        <div class="team-names" id="match-team-names">Team 1 vs Team 2</div>
+        <div class="match-score" id="match-score">2:1</div>
+        <div class="players-results">
+            <div class="player-result">
+                <img id="player-avatar-1" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mariusz.png" alt="Player 1">
+                <div class="result-box" id="player-result-1"></div>
+            </div>
+            <div class="player-result">
+                <img id="player-avatar-2" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/%C5%81ukasz.png" alt="Player 2">
+                <div class="result-box" id="player-result-2"></div>
+            </div>
+        </div>
+        <div class="players-results">
+            <div class="player-result">
+                <img id="player-avatar-3" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Mateusz.png" alt="Player 3">
+                <div class="result-box" id="player-result-3"></div>
+            </div>
+            <div class="player-result">
+                <img id="player-avatar-4" src="https://raw.githubusercontent.com/BlackPointX/MLMP-BetLiga/refs/heads/main/images/Patryk.png" class="player-avatar" alt="Player 4">
+                <div class="result-box" id="player-result-4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
 </body>
 </html>
