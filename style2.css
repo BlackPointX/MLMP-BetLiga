@@ -878,4 +878,17 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     100% { opacity: 1; }
 }
 
+.sticky-row {
+    position: -webkit-sticky; /* Safari support */
+    position: sticky;
+    top: 0; /* Sticky element will stop at the top of the container */
+    background-color: white; /* Tło, aby wiersz był widoczny */
+    z-index: 1000; /* Ustawienie wierzchu */
+    border-bottom: 2px solid #ddd; /* Opcjonalna granica */
+}
+
+.kolejka-row {
+    position: relative;
+    z-index: 999; /* Aby wiersz kolejki znajdował się nad sticky-row */
+}
 
