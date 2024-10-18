@@ -856,6 +856,8 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     cursor: pointer;
     font-weight: bold;
     background-color: #0f1f78b0;
+    padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .match-container {
