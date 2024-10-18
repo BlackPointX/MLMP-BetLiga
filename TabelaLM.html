@@ -120,6 +120,15 @@
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = ''; // Wyczyść istniejące dane
 
+// Dodaj separator nad pierwszym spotkaniem
+const firstSeparatorRow = document.createElement('tr');
+firstSeparatorRow.classList.add('separator-row');
+firstSeparatorRow.innerHTML = `
+    <td colspan="7" class="separator">Kolejka 1</td>
+`;
+tbody.appendChild(firstSeparatorRow);
+
+
     // Zakładamy, że pierwszy wiersz to nagłówki
     for (let i = 1; i < data.length; i++) {
         const rowData = data[i];
@@ -195,6 +204,17 @@
             </td>
         `;
         tbody.appendChild(row);
+
+        // Sprawdzenie, czy wartość w kolumnie "Dł kolejki" (indeks 10) jest niepusta
+        if (rowData[10] !== "") {
+            // Dodaj przerwę po wierszu
+            const separatorRow = document.createElement('tr');
+            separatorRow.classList.add('separator-row');
+            separatorRow.innerHTML = `
+                <td colspan="7" class="separator">Kolejka ${rowData[10]}</td>
+            `;
+            tbody.appendChild(separatorRow);
+        }
     }
 
     // Opcjonalnie: Dodanie klasy 'fade-in-row' do animacji
@@ -205,6 +225,7 @@
         }, index * 100); // Opóźnienie dla efektu animacji
     });
 }
+
 
 
         // Inicjalizacja po załadowaniu strony
