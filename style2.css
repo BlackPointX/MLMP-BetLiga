@@ -30,7 +30,7 @@ body {
 
 /* Styl nagłówka */
 .header h1, .header h2 {
-    margin: 0;
+    margin: 50px;
     color: #fff;
 }
 
@@ -50,6 +50,47 @@ body {
     margin-top: 15px;
     opacity: 0.9;
 }
+
+/* Styl dla wierszy tabeli */
+/* ... Twoje istniejące style ... */
+
+/* Styl dla wierszy tabeli */
+table.leaderboard tbody tr.player-row {
+    background-color: rgba(0, 85, 204, 0.8); /* Jaśniejszy kolor dla nieparzystych wierszy z 80% nieprzezroczystością */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease, background-color 1s ease;
+}
+
+table.leaderboard tbody tr.player-row.fade-in-row {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Naprzemienne kolory wierszy z przezroczystością */
+table.leaderboard tbody tr.player-row:nth-child(odd) {
+    background-color: rgba(0, 85, 204, 0.7); /* Jaśniejszy kolor dla nieparzystych wierszy */
+}
+
+table.leaderboard tbody tr.player-row:nth-child(even) {
+    background-color: rgba(0, 51, 153, 0.7); /* Ciemniejszy kolor dla parzystych wierszy */
+}
+
+/* Efekt podświetlenia wiersza po najechaniu myszką */
+table.leaderboard tbody tr.player-row:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Jasny efekt podświetlenia z 20% nieprzezroczystością */
+}
+
+/* Dodanie płynnego przejścia między kolorami */
+table.leaderboard tbody tr.player-row {
+    transition: background-color 1s ease;
+}
+
+/* ... Reszta Twoich stylów ... */
+
+
+
+
 
 table.leaderboard {
     width: 100%;
@@ -146,7 +187,6 @@ table.leaderboard th:nth-child(7), table.leaderboard td:nth-child(7) {
 /* Styl dla wierszy tabeli */
 table.leaderboard tbody tr.player-row {
     background-color: #0044cc;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -670,12 +710,18 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     cursor: pointer;
 }
 
+.match-results {
+        margin-top: 50px;
+}
+
+
 .main-match-result {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
     margin-bottom: 30px;
+    margin-top: 50px;
 }
 
 .team-logo-large {
