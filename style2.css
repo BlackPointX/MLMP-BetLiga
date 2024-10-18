@@ -963,22 +963,30 @@ table.leaderboard tbody tr.details-row.expanded .details-placeholder {
     align-items: center;
     justify-content: center;
     margin: 5px 0;
+    background-color: #1a1a3d;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Utrzymanie dystansu między elementami */
+    color: white;
+    transition: background-color 0.3s ease;
 }
 
+
 .popup-content .player-result img {
-    width: 30px;
-    height: 30px;
+    width: 35%;
     margin-right: 10px;
 }
 
 .popup-content .result-box {
-    width: 40px;
-    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 5px;
     font-size: 1.2em;
+    padding: 15px 20px;
 }
 
 .popup-content .green {
